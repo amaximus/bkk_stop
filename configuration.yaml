@@ -1,0 +1,3 @@
+frontend:
+  extra_html_url:
+    - /local/custom_ui/state-card-bkk-stop.html
