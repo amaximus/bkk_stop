@@ -21,4 +21,4 @@ minsAfter: 25
 wheelchair: true
 ```
 
-![bkk_stop example](amaximus.github.com/bkk_stop/example/bkk_hass.jpg)
+![bkk_stop example](example/bkk_hass.jpg)
