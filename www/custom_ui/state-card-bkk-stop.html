@@ -3,19 +3,21 @@
     <style include='iron-flex iron-flex-alignment'></style>
     <!--style include="paper-item-shared-styles"></style-->
     <style>
+    #station { font-weight: bold; }
+    #bkkpanel { margin-left: -2em; }
     table { padding: 0px; margin: 0px; }
     .BUS { color: #44739e; width: 2em; }
     .TROLLEYBUS { color: #cc0000; width: 2em; }
     .TRAM { color: #e1e100; width: 2em; }
+    .RAIL { color: #2ecc71; width: 2em; }
     .SUBWAY { width: 2em; }
-    .true { color: #000000; visibility: visible; float: left; }
-    .false { visibility: collapse; }
     paper-icon-item { --paper-item-icon-width: 10px; margin: 0px; }
     paper-icon-item.smallicon {
         --paper-item-icon-width: 5px; margin-left: -2.4em; float: left;
         --iron-icon-width: 15px;
         --iron-icon-height: 15px;
     }
+
     </style>
 
     <div id="station">[[stateObj.attributes.stationName]]:</div>
@@ -49,6 +51,7 @@
     </template>
     </table>
     </div>
+    <!--textarea>[[_toStr(stateObj)]]</textarea-->
 
   </template>
 </dom-module>
@@ -104,6 +107,7 @@ class StateCardBKKStop extends Polymer.Element {
         element.wheelchair = 'false';
         e = 'wheelchair' + i;
         if ( stateObj.attributes.hasOwnProperty(e) ) {
+           //element.wheelchair = ( eval('stateObj.attributes.wheelchair' + i) == "true" );
            element.wheelchair = eval('stateObj.attributes.wheelchair' + i);
         }
         element.bike = 'false';
@@ -125,6 +129,8 @@ class StateCardBKKStop extends Polymer.Element {
 	return "mdi:tram"
     } else if (type == "SUBWAY") {
 	return "mdi:subway"
+    } else if (type == "RAIL") {
+	return "mdi:train"
     }
     return "mdi:bus"
   }
