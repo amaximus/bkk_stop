@@ -111,9 +111,9 @@ class StateCardBKKStop extends Polymer.Element {
            element.wheelchair = eval('stateObj.attributes.wheelchair' + i);
         }
         element.bike = 'false';
-        e = 'bike' + i;
+        e = 'bikesallowed' + i;
         if ( stateObj.attributes.hasOwnProperty(e) ) {
-           element.bike = eval('stateObj.attributes.bike' + i);
+           element.bike = eval('stateObj.attributes.bikesallowed' + i);
         }
 	bkkObjN.push(element);
     } 
