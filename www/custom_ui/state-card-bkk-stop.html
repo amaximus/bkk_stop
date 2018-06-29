@@ -136,7 +136,7 @@
         computebkkObjN(hass, config, stateObj) {
             var bkkObjN = [];
 
-            for (i = 0; i < stateObj.attributes.items; i++) {
+            for (var i = 0; i < stateObj.attributes.items; i++) {
                 var e = 'wheelchair' + i;
 
                 var element = new Object();
@@ -145,7 +145,7 @@
                 element.rin = eval('stateObj.attributes.in' + i);
                 element.rtype = eval('stateObj.attributes.type' + i);
                 element.wheelchair = 'false';
-                
+
                 if (stateObj.attributes.hasOwnProperty(e)) {
                     //element.wheelchair = ( eval('stateObj.attributes.wheelchair' + i) == "true" );
                     element.wheelchair = eval('stateObj.attributes.wheelchair' + i);
