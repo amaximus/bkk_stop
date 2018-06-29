@@ -1,140 +1,182 @@
 <dom-module id='state-card-bkk-stop'>
-  <template is='dom-if' if='[[bkkObjN]]'>
-    <style include='iron-flex iron-flex-alignment'></style>
-    <!--style include="paper-item-shared-styles"></style-->
-    <style>
-    #station { font-weight: bold; }
-    #bkkpanel { margin-left: -2em; }
-    table { padding: 0px; margin: 0px; }
-    .BUS { color: #44739e; width: 2em; }
-    .TROLLEYBUS { color: #cc0000; width: 2em; }
-    .TRAM { color: #e1e100; width: 2em; }
-    .RAIL { color: #2ecc71; width: 2em; }
-    .SUBWAY { width: 2em; }
-    paper-icon-item { --paper-item-icon-width: 10px; margin: 0px; }
-    paper-icon-item.smallicon {
-        --paper-item-icon-width: 5px; margin-left: -2.4em; float: left;
-        --iron-icon-width: 15px;
-        --iron-icon-height: 15px;
-    }
+    fdsafads
+    <template is='dom-if' if='[[bkkObjN]]'>
+        <style include='iron-flex iron-flex-alignment'></style>
+        <!--style include="paper-item-shared-styles"></style-->
+        <style>
+            #station {
+                font-weight: bold;
+            }
 
-    </style>
+            #bkkpanel {
+                margin-left: -2em;
+            }
 
-    <div id="station">[[stateObj.attributes.stationName]]:</div>
-    <div id="bkkpanel">
+            table {
+                padding: 0px;
+                margin: 0px;
+            }
 
-    <table>
-    <template is="dom-repeat" items="{{bkkObjN}}">
-      <tr><td class$="{{item.rtype}}">
-             <paper-icon-item>
-             <iron-icon icon='{{getIcon(item.rtype)}}' item-icon></iron-icon>
-             &nbsp;{{item.routeid}}
-             </paper-icon-item>
+            .BUS {
+                color: #44739e;
+                width: 2em;
+            }
 
-           <td>
-             <template is="dom-if" if='{{_showIcon(item.wheelchair)}}'>
-                <paper-icon-item class="smallicon"> 
-                <iron-icon icon='mdi:wheelchair-accessibility' item-icon></iron-icon>
-                </paper-icon-item>
-             </template>
+            .TROLLEYBUS {
+                color: #cc0000;
+                width: 2em;
+            }
 
-           <td>
-             <template is="dom-if" if='{{_showIcon(item.bike)}}'>
-                <paper-icon-item class="smallicon"> 
-                <iron-icon icon='mdi:bike' item-icon></iron-icon>
-                </paper-icon-item>
-             </template>
+            .TRAM {
+                color: #e1e100;
+                width: 2em;
+            }
 
-          <td>to {{item.headsign}}
-          <td>in {{item.rin}} mins
-      </tr>
+            .RAIL {
+                color: #2ecc71;
+                width: 2em;
+            }
+
+            .SUBWAY {
+                width: 2em;
+            }
+
+            paper-icon-item {
+                --paper-item-icon-width: 10px;
+                margin: 0px;
+            }
+
+            paper-icon-item.smallicon {
+                --paper-item-icon-width: 5px;
+                margin-left: -2.4em;
+                float: left;
+                --iron-icon-width: 15px;
+                --iron-icon-height: 15px;
+            }
+
+        </style>
+
+        <div id="station">[[stateObj.attributes.stationName]]:</div>
+        <div id="bkkpanel">
+
+            <table>
+                <template is="dom-repeat" items="{{bkkObjN}}">
+                    <tr>
+                        <td class$="{{item.rtype}}">
+                            <paper-icon-item>
+                                <iron-icon icon='{{getIcon(item.rtype)}}' item-icon></iron-icon>
+                                &nbsp;{{item.routeid}}
+                            </paper-icon-item>
+
+                        <td>
+                            <template is="dom-if" if='{{_showIcon(item.wheelchair)}}'>
+                                <paper-icon-item class="smallicon">
+                                    <iron-icon icon='mdi:wheelchair-accessibility' item-icon></iron-icon>
+                                </paper-icon-item>
+                            </template>
+
+                        <td>
+                            <template is="dom-if" if='{{_showIcon(item.bike)}}'>
+                                <paper-icon-item class="smallicon">
+                                    <iron-icon icon='mdi:bike' item-icon></iron-icon>
+                                </paper-icon-item>
+                            </template>
+
+                        <td>to {{item.headsign}}
+                        <td>in {{item.rin}} mins
+                    </tr>
+                </template>
+            </table>
+        </div>
+        <!--textarea>[[_toStr(stateObj)]]</textarea-->
+
     </template>
-    </table>
-    </div>
-    <!--textarea>[[_toStr(stateObj)]]</textarea-->
-
-  </template>
 </dom-module>
 
 <script>
-class StateCardBKKStop extends Polymer.Element {
-  static get is() { return 'state-card-bkk-stop'; }
-
-  static get properties() {
-    return {
-      // Home Assistant object
-      hass: Object,
-      // inDialog is true if shown as more-info-card
-      inDialog: {
-        type: Boolean,
-        value: false,
-      },
-      // includes state, config and more information of the entity
-      stateObj: Object,
-      config: {
-        type: Object,
-        computed: 'computeConfig(stateObj)',
-      },
-      bkkObjN: {
-        type: Object,
-        computed: 'computebkkObjN(hass, config, stateObj)',
-      },      
-    };
-  }
-
-  _toStr(obj) {
-    return JSON.stringify(obj);
-  }
-
-  _showIcon(visibility) {
-      return  visibility.toLowerCase() === "true"; 
-  }
-
-  computeConfig(stateObj) {     
-    return stateObj.attributes.config;
-  }
-
-  computebkkObjN(hass, config, stateObj) {
-      var bkkObjN = [];
-
-      var i =0;
-      for ( i = 0; i < stateObj.attributes.items; i++) {
-        var element = new Object();
-        element.headsign = eval('stateObj.attributes.headsign' + i); 
-        element.routeid = eval('stateObj.attributes.routeid' + i);
-        element.rin = eval('stateObj.attributes.in' + i);
-        element.rtype = eval('stateObj.attributes.type' + i);
-        element.wheelchair = 'false';
-        e = 'wheelchair' + i;
-        if ( stateObj.attributes.hasOwnProperty(e) ) {
-           //element.wheelchair = ( eval('stateObj.attributes.wheelchair' + i) == "true" );
-           element.wheelchair = eval('stateObj.attributes.wheelchair' + i);
+    class StateCardBKKStop extends Polymer.Element {
+        static get is() {
+            return 'state-card-bkk-stop';
         }
-        element.bike = 'false';
-        e = 'bikesallowed' + i;
-        if ( stateObj.attributes.hasOwnProperty(e) ) {
-           element.bike = eval('stateObj.attributes.bikesallowed' + i);
-        }
-	bkkObjN.push(element);
-    } 
-    return bkkObjN;
-  }
 
-  getIcon(type) {
-    if (type == "BUS") {
-	return "mdi:bus"
-    } else if (type == "TROLLEYBUS") {
-	return "mdi:bus"
-    } else if (type == "TRAM") {
-	return "mdi:tram"
-    } else if (type == "SUBWAY") {
-	return "mdi:subway"
-    } else if (type == "RAIL") {
-	return "mdi:train"
+        static get properties() {
+            return {
+                // Home Assistant object
+                hass: Object,
+                // inDialog is true if shown as more-info-card
+                inDialog: {
+                    type: Boolean,
+                    value: false,
+                },
+                // includes state, config and more information of the entity
+                stateObj: Object,
+                config: {
+                    type: Object,
+                    computed: 'computeConfig(stateObj)',
+                },
+                bkkObjN: {
+                    type: Object,
+                    computed: 'computebkkObjN(hass, config, stateObj)',
+                },
+            };
+        }
+
+        _toStr(obj) {
+            return JSON.stringify(obj);
+        }
+
+        _showIcon(visibility) {
+            return visibility.toLowerCase() === "true";
+        }
+
+        computeConfig(stateObj) {
+            return stateObj.attributes.config;
+        }
+
+        computebkkObjN(hass, config, stateObj) {
+            var bkkObjN = [];
+
+            for (i = 0; i < stateObj.attributes.items; i++) {
+                var e = 'wheelchair' + i;
+
+                var element = new Object();
+                element.headsign = eval('stateObj.attributes.headsign' + i);
+                element.routeid = eval('stateObj.attributes.routeid' + i);
+                element.rin = eval('stateObj.attributes.in' + i);
+                element.rtype = eval('stateObj.attributes.type' + i);
+                element.wheelchair = 'false';
+                
+                if (stateObj.attributes.hasOwnProperty(e)) {
+                    //element.wheelchair = ( eval('stateObj.attributes.wheelchair' + i) == "true" );
+                    element.wheelchair = eval('stateObj.attributes.wheelchair' + i);
+                }
+                element.bike = 'false';
+                e = 'bikesallowed' + i;
+                if (stateObj.attributes.hasOwnProperty(e)) {
+                    element.bike = eval('stateObj.attributes.bikesallowed' + i);
+                }
+                bkkObjN.push(element);
+            }
+            return bkkObjN;
+        }
+
+        getIcon(type) {
+            if (type == "BUS") {
+                return "mdi:bus"
+            } else if (type == "TROLLEYBUS") {
+                return "mdi:bus"
+            } else if (type == "TRAM") {
+                return "mdi:tram"
+            } else if (type == "SUBWAY") {
+                return "mdi:subway"
+            } else if (type == "RAIL") {
+                return "mdi:train"
+            }
+            return "mdi:bus"
+        }
+
     }
-    return "mdi:bus"
-  }
 
-}
-customElements.define(StateCardBKKStop.is, StateCardBKKStop);
+    customElements.define(StateCardBKKStop.is, StateCardBKKStop);
 </script>
+
