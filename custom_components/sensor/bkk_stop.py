@@ -25,6 +25,7 @@ CONF_BIKES = 'bikes'
 CONF_IGNORENOW = 'ignoreNow'
 
 DEFAULT_NAME = 'BKK Futar'
+DEFAULT_ICON = 'mdi:bus'
 
 SCAN_INTERVAL = timedelta(seconds=120)
 
