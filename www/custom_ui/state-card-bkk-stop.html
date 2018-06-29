@@ -1,5 +1,4 @@
 <dom-module id='state-card-bkk-stop'>
-    fdsafads
     <template is='dom-if' if='[[bkkObjN]]'>
         <style include='iron-flex iron-flex-alignment'></style>
         <!--style include="paper-item-shared-styles"></style-->
@@ -136,10 +135,10 @@
         computebkkObjN(hass, config, stateObj) {
             var bkkObjN = [];
 
-            for (var i = 0; i < stateObj.attributes.items; i++) {
+            for (let i = 0; i < stateObj.attributes.items; i++) {
                 var e = 'wheelchair' + i;
-
                 var element = new Object();
+
                 element.headsign = eval('stateObj.attributes.headsign' + i);
                 element.routeid = eval('stateObj.attributes.routeid' + i);
                 element.rin = eval('stateObj.attributes.in' + i);
@@ -150,8 +149,8 @@
                     //element.wheelchair = ( eval('stateObj.attributes.wheelchair' + i) == "true" );
                     element.wheelchair = eval('stateObj.attributes.wheelchair' + i);
                 }
+
                 element.bike = 'false';
-                e = 'bikesallowed' + i;
                 if (stateObj.attributes.hasOwnProperty(e)) {
                     element.bike = eval('stateObj.attributes.bikesallowed' + i);
                 }
@@ -179,4 +178,3 @@
 
     customElements.define(StateCardBKKStop.is, StateCardBKKStop);
 </script>
-
