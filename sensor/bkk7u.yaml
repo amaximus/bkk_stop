@@ -1,16 +1,16 @@
-platform: bkk_stop
-name: 'bkk7u'
-stopId: 'BKK_F04464'
-minsAfter: 25 
-# display vechicles leaving from station in
-# the next <minsAfter> minutes.
-# default: 20
-wheelchair: true
-# display vechicel's wheelchair accessibility.
-# default: false
-bikes: false 
-# display whether bikes are allowed on
-# vehicle. Default: false
-ignoreNow: true
-# ignore vehicles already in the station.
-# default: true
+  - platform: bkk_stop
+    name: 'bkk7u'
+    stopId: 'BKK_F04036'
+    minsAfter: 25 
+    # display vechicles leaving from station in
+    # the next <minsAfter> minutes.
+    # default: 20
+    wheelchair: true
+    # display vechicel's wheelchair accessibility.
+    # default: false
+    bikes: false 
+    # display whether bikes are allowed on
+    # vehicle. Default: false
+    ignoreNow: true
+    # ignore vehicles already in the station.
+    # default: true
