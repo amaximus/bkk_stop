@@ -1,0 +1,3 @@
+resources:
+  - url: /local/custom-lovelace/bkk_stop/bkk_stop.js
+    type: js
