@@ -22,7 +22,7 @@ line information departing in the near future from a configurable stop.
     bike: true
 ```
 #### How to get StopId:
-Visit [futar.bkk.hu](http://futar.bkk.hu) and select your stop, then copy the id like this:
+Visit [futar.bkk.hu](http://futar.bkk.hu) and select your stop, then copy the id:
 ![bkk_stop example](example/bkk_stopid.jpg)
 
 #### Example card:
