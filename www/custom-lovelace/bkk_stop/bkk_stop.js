@@ -2,7 +2,9 @@ class BkkStop extends HTMLElement {
   set hass(hass) {
     if (!this.content) {
       const card = document.createElement('ha-card');
-      card.header = 'BKK Futár';
+      //card.header = 'BKK Futár';
+      //alert(this.content);
+      //card header = this.config.name;
       //card.header = state.attributes.stationName;;
       this.content = document.createElement('div');
       this.content.style.padding = '0 16px 16px';
@@ -58,7 +60,7 @@ class BkkStop extends HTMLElement {
     //[ikon-járat] [kerekesszék] [kerékpár] [cél] [perc]
     
     for (let i = 0; i < state.attributes.items; i++) {
-        var jarat = '<ha-icon icon="'+this.getIcon(bkkObjN[i].rtype)+'"></ha-icon>'+' '+bkkObjN[i].routeid;
+        var jarat = '<ha-icon style="color:'+this.getIconColor(bkkObjN[i].rtype)+'" icon="'+this.getIcon(bkkObjN[i].rtype)+'"></ha-icon>'+' '+bkkObjN[i].routeid;
         innerstring += '<tr><td>'+jarat+'</td><td>'+'</td><td>'+bkkObjN[i].headsign+'</td><td>'+bkkObjN[i].rin+'</td></tr>';
     }
     
@@ -134,6 +136,17 @@ class BkkStop extends HTMLElement {
           return "mdi:train"
       }
       return "mdi:bus"
+  }
+  
+  getIconColor(type) {
+      if (type === "BUS") {
+          return "Blue"
+      } else if (type === "TROLLEYBUS") {
+          return "Red"
+      } else if (type === "TRAM") {
+          return "Yellow"
+      }
+      return "Black"
   }
 }
 
