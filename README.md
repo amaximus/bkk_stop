@@ -20,5 +20,8 @@ line information departing in the near future from a configurable stop.
     minsAfter: 25
     wheelchair: true
 ```
+#### How to get StopId:
 ![bkk_stop example](example/bkk_stopid.jpg)
+
+#### Example card:
 ![bkk_stop example](example/bkk_lovelace.jpg)
