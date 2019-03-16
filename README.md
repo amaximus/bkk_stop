@@ -14,11 +14,11 @@ line information departing in the near future from a configurable stop.
 
 #### Example
 ```
-platform: bkk_stop
-name: 'bkk7u'
-stopId: 'BKK_F00940'
-minsAfter: 25
-wheelchair: true
+  - platform: bkk_stop
+    name: 'bkk7u'
+    stopId: 'BKK_F00940'
+    minsAfter: 25
+    wheelchair: true
 ```
 
 ![bkk_stop example](example/bkk_hass.jpg)
