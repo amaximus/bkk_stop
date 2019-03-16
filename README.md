@@ -20,5 +20,5 @@ line information departing in the near future from a configurable stop.
     minsAfter: 25
     wheelchair: true
 ```
-
-![bkk_stop example](example/bkk_hass.jpg)
+![bkk_stop example](example/bkk_stopid.jpg)
+![bkk_stop example](example/bkk_lovelace.jpg)

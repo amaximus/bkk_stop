@@ -18,13 +18,15 @@ class BkkStop extends HTMLElement {
     //card.header = state.attributes.stationName;;
     
     let bkkObjN = [];
-    var innerstring = `
+    
+    var innerstring = `<b>${stationname}:</b><br><table width="100%">`;
+    /*var innerstring = `
     <table width="100%">
         <th>
             <td>Járat</td>
             <td>Cél</td>
             <td>Perc</td>
-        </th>`;
+        </th>`;*/
 
     for (let i = 0; i < state.attributes.items; i++) {
       let element = {};
@@ -65,8 +67,8 @@ class BkkStop extends HTMLElement {
     //[ikon-járat] [kerekesszék] [kerékpár] [cél] [perc]
     
     for (let i = 0; i < state.attributes.items; i++) {
-        var jarat = bkkObjN[i].rtype+' '+bkkObjN[i].routeid;
-        innerstring += '<tr><td>'+jarat+'</td><td>'+'</td><td>'+bkkObjN[i].headsign+'</td><td>'+bkkObjN[i].rin+'</td></tr>';
+        var jarat = '<ha-icon icon="'+this.getIcon(bkkObjN[i].rtype)+'"></ha-icon>'+' '+bkkObjN[i].routeid;
+        innerstring += '<tr><td>'+jarat+'</td><td>'+'</td><td>'+bkkObjN[i].headsign+' irányába </td><td>'+bkkObjN[i].rin+' perc múlva</td></tr>';
     }
     
     innerstring += '</table>';
@@ -92,7 +94,6 @@ class BkkStop extends HTMLElement {
     
     
     
-     
     
     
     
@@ -103,13 +104,14 @@ class BkkStop extends HTMLElement {
     
     
     
-    innerstring += 
+    
+    /*innerstring += 
      `<b>${stationname}:</b><br>
       <ha-icon icon="mdi:bus"></ha-icon> 52 <ha-icon icon="mdi:wheelchair-accessibility"></ha-icon><ha-icon icon="mdi:bike"></ha-icon> P.erzsébet, Pacsirtatelep 9 perc<br>
       <ha-icon icon="mdi:tram"></ha-icon> 52 <ha-icon icon="mdi:wheelchair-accessibility" class="smallicon"></ha-icon><ha-icon icon="mdi:bike" class="smallicon"></ha-icon> P.erzsébet, Pacsirtatelep 9 perc
       
       
-    `;
+    `;*/
     
 
     this.content.innerHTML = innerstring+'</table>';
@@ -128,20 +130,20 @@ class BkkStop extends HTMLElement {
     return 3;
   }
   
-        getIcon(type) {
-            if (type === "BUS") {
-                return "mdi:bus"
-            } else if (type === "TROLLEYBUS") {
-                return "mdi:bus"
-            } else if (type === "TRAM") {
-                return "mdi:tram"
-            } else if (type === "SUBWAY") {
-                return "mdi:subway"
-            } else if (type === "RAIL") {
-                return "mdi:train"
-            }
-            return "mdi:bus"
-        }
+  getIcon(type) {
+      if (type === "BUS") {
+          return "mdi:bus"
+      } else if (type === "TROLLEYBUS") {
+          return "mdi:bus"
+      } else if (type === "TRAM") {
+          return "mdi:tram"
+      } else if (type === "SUBWAY") {
+          return "mdi:subway"
+      } else if (type === "RAIL") {
+          return "mdi:train"
+      }
+      return "mdi:bus"
+  }
 }
 
 customElements.define('custom-bkk-stop', BkkStop);
