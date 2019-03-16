@@ -127,6 +127,21 @@ class BkkStop extends HTMLElement {
   getCardSize() {
     return 3;
   }
+  
+        getIcon(type) {
+            if (type === "BUS") {
+                return "mdi:bus"
+            } else if (type === "TROLLEYBUS") {
+                return "mdi:bus"
+            } else if (type === "TRAM") {
+                return "mdi:tram"
+            } else if (type === "SUBWAY") {
+                return "mdi:subway"
+            } else if (type === "RAIL") {
+                return "mdi:train"
+            }
+            return "mdi:bus"
+        }
 }
 
 customElements.define('custom-bkk-stop', BkkStop);
