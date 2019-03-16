@@ -19,8 +19,10 @@ line information departing in the near future from a configurable stop.
     stopId: 'BKK_F00940'
     minsAfter: 25
     wheelchair: true
+    bike: true
 ```
 #### How to get StopId:
+Visit [futar.bkk.hu](http://futar.bkk.hu) and select your stop, then copy the id like this:
 ![bkk_stop example](example/bkk_stopid.jpg)
 
 #### Example card:
