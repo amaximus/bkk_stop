@@ -2,7 +2,7 @@ class BkkStop extends HTMLElement {
   set hass(hass) {
     if (!this.content) {
       const card = document.createElement('ha-card');
-      card.header = 'BKK';
+      card.header = 'BKK Futár';
       //card.header = state.attributes.stationName;;
       this.content = document.createElement('div');
       this.content.style.padding = '0 16px 16px';
@@ -15,18 +15,9 @@ class BkkStop extends HTMLElement {
     const stateStr = state ? state.state : 'unavailable';
     const stationname = state.attributes.stationName;
     
-    //card.header = state.attributes.stationName;;
-    
     let bkkObjN = [];
     
     var innerstring = `<b>${stationname}:</b><br><table width="100%">`;
-    /*var innerstring = `
-    <table width="100%">
-        <th>
-            <td>Járat</td>
-            <td>Cél</td>
-            <td>Perc</td>
-        </th>`;*/
 
     for (let i = 0; i < state.attributes.items; i++) {
       let element = {};
@@ -68,7 +59,7 @@ class BkkStop extends HTMLElement {
     
     for (let i = 0; i < state.attributes.items; i++) {
         var jarat = '<ha-icon icon="'+this.getIcon(bkkObjN[i].rtype)+'"></ha-icon>'+' '+bkkObjN[i].routeid;
-        innerstring += '<tr><td>'+jarat+'</td><td>'+'</td><td>'+bkkObjN[i].headsign+' irányába </td><td>'+bkkObjN[i].rin+' perc múlva</td></tr>';
+        innerstring += '<tr><td>'+jarat+'</td><td>'+'</td><td>'+bkkObjN[i].headsign+'</td><td>'+bkkObjN[i].rin+'</td></tr>';
     }
     
     innerstring += '</table>';
