@@ -1,3 +1,10 @@
 resources:
   - url: /local/custom-lovelace/bkk_stop/bkk_stop.js
     type: js
+    
+    
+    
+views:
+  - cards:
+    - type: 'custom:custom-bkk-stop'
+      entity: sensor.bkk7u
