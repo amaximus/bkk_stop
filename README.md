@@ -1,11 +1,11 @@
-# Custom components for Home Assistant
+# Custom component for Home Assistant
 ## BKK stop custom component
-## Providing also a state card for legacyUI and a custom card for Lovelacw
+## Providing also a custom state card for legacyUI and a custom card for Lovelace
 
 This custom component and custom card shows Budapest Public Transportation (BKK)
 line information departing in the near future from a configurable stop.
 
-Please note that the structure of custom components has changed as of version 0.93.0. 
+Please note that the structure of custom components in HomeAssistant has changed as of version 0.93.0. 
 See [https://developers.home-assistant.io/blog/2019/04/12/new-integration-structure.html](https://developers.home-assistant.io/blog/2019/04/12/new-integration-structure.html).
 
 #### Configuration variables:
@@ -17,11 +17,12 @@ See [https://developers.home-assistant.io/blog/2019/04/12/new-integration-struct
 **ignoreNow** (Optional): Ignore vehicles already in the station (default: true) <br />
 
 #### Lovelace UI
-Lovelace UI does not support platform attributes natively.
+Lovelace UI does not support platform attributes natively.<br />
 Inspired by [entity-attributes-card](https://github.com/custom-cards/entity-attributes-card)
-on handling attributes in Lovelace, a custom BKK Stop card was a dept and now made available for Lovelace UI.
+on handling attributes in Lovelace, a Lovelace custom card was a dept and now made available for BKK Stop.
 
-Once bkk-stop-card.js got downloaded into your $homeassitant_config_dir/www, add the following lines to your ui-lovelace.yaml:
+Once bkk-stop-card.js got downloaded into your $homeassitant_config_dir/www, add the following
+lines to your ui-lovelace.yaml (entity should be the sensor of bkk_stop platform you defined):
 ```
 resources:
   - {type: module, url: '/local/bkk-stop-card.js'}
@@ -29,10 +30,12 @@ resources:
     cards:
       - type: custom:bkk-stop-card
         entity: sensor.bkk7u
+      - type: custom:bkk-stop-card
+        entity: sensor.bkkxu
 ```
 
 #### Legacy UI
-Custom state card is provided for presenting data on UI. Pls see the legacyUI directory structure as example.
+Custom state card is provided for presenting data on legacy UI. Pls see the legacyUI directory structure for example.
 
 #### Example
 ```
