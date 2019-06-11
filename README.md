@@ -43,8 +43,8 @@ minsAfter: 25
 wheelchair: true
 ```
 
-Lovelace UI:
+Lovelace UI:<br />
 ![bkk_stop Lovelace example](example/bkk_lovelace.jpg)
 
-Legacy UI:
+Legacy UI:<br />
 ![bkk_stop legacy UI example](example/bkk_hass.jpg)
