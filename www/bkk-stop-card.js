@@ -116,6 +116,12 @@ class BKKStopCard extends HTMLElement {
     });
     for (var i=0; i < items; i++) {
       if ( routeid[i] ) {
+        if ( typeof wheelchair[i] == 'undefined' ) {
+          wheelchair[i] = '';
+        }
+        if ( typeof bikes[i] == 'undefined' ) {
+          bikes[i] = '';
+        }
         routeobjarray.push({
           key: routeid[i],
           vehicle: vehicle[i],
