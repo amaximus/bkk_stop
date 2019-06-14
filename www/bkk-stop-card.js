@@ -14,7 +14,7 @@ class BKKStopCard extends HTMLElement {
     var bikes = new Array();
     var icon = new Array();
     var routeobjarray = [];
-    var station;
+    var station = '';
     var items;
 
     function _filterName(stateObj, pattern) {
