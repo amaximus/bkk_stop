@@ -5,6 +5,8 @@ class BKKStopCard extends HTMLElement {
     this.attachShadow({ mode: 'open' });
   }
 
+  version() { return "0.1.0"; }
+
   _getAttributes(hass, filter1) {
     var inmin = new Array();
     var routeid = new Array();
