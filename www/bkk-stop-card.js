@@ -14,7 +14,7 @@ class BKKStopCard extends HTMLElement {
     var bikes = new Array();
     var icon = new Array();
     var routeobjarray = [];
-    var station = '';
+    var station;
     var items;
 
     function _filterName(stateObj, pattern) {
@@ -114,25 +114,38 @@ class BKKStopCard extends HTMLElement {
         items = attributes.get(key).value;
       }
     });
-    for (var i=0; i < items; i++) {
-      if ( routeid[i] ) {
-        if ( typeof wheelchair[i] == 'undefined' ) {
-          wheelchair[i] = '';
+    if ( items > 0 ) {
+      for (var i=0; i < items; i++) {
+        if ( routeid[i] ) {
+          if ( typeof wheelchair[i] == 'undefined' ) {
+            wheelchair[i] = '';
+          }
+          if ( typeof bikes[i] == 'undefined' ) {
+            bikes[i] = '';
+          }
+          routeobjarray.push({
+            key: routeid[i],
+            vehicle: vehicle[i],
+            inmin: inmin[i],
+            headsign: headsign[i],
+            wheelchair: wheelchair[i],
+            bikes: bikes[i],
+            icon: icon[i],
+            station:station
+          });
         }
-        if ( typeof bikes[i] == 'undefined' ) {
-          bikes[i] = '';
-        }
-        routeobjarray.push({
-          key: routeid[i],
-          vehicle: vehicle[i],
-          inmin: inmin[i],
-          headsign: headsign[i],
-          wheelchair: wheelchair[i],
-          bikes: bikes[i],
-          icon: icon[i],
-          station:station
-        });
       }
+    } else {
+      routeobjarray.push({
+        key: routeid[i],
+        vehicle: vehicle[i],
+        inmin: inmin[i],
+        headsign: headsign[i],
+        wheelchair: wheelchair[i],
+        bikes: bikes[i],
+        icon: icon[i],
+        station:station
+      });
     }
     return Array.from(routeobjarray.values());
   }
