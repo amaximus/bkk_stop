@@ -139,15 +139,15 @@ class BKKStopCard extends HTMLElement {
       }
     } else {
       routeobjarray.push({
-        key: routeid[i],
-        vehicle: vehicle[i],
-        inmin: inmin[i],
-        headsign: headsign[i],
-        wheelchair: wheelchair[i],
-        bikes: bikes[i],
-        icon: icon[i],
-        station:station
-      });
+        key: 'No service',
+        vehicle: '',
+        inmin: 'following',
+        headsign: 'any destination',
+        wheelchair: '',
+        bikes: '',
+        icon: '',
+        station: station
+      }); 
     }
     return Array.from(routeobjarray.values());
   }
