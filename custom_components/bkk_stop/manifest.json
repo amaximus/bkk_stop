@@ -1,0 +1,8 @@
+{
+  "domain": "bkk_stop",
+  "name": "BKK Stop Information",
+  "documentation": "https://github.com/amaximus/bkk_stop",
+  "dependencies": [],
+  "codeowners": ["@amaximus"],
+  "requirements": []
+}

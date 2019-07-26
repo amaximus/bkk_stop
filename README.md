@@ -5,9 +5,6 @@
 This custom component and custom card shows Budapest Public Transportation (BKK)
 line information departing in the near future from a configurable stop.
 
-Please note that the structure of custom components in HomeAssistant has changed as of version 0.93.0. 
-See [https://developers.home-assistant.io/blog/2019/04/12/new-integration-structure.html](https://developers.home-assistant.io/blog/2019/04/12/new-integration-structure.html).
-
 #### Configuration variables:
 **name** (Optional): Name of component<br />
 **stopId** (Required): StopId as per [futar.bkk.hu](http://futar.bkk.hu)<br />
