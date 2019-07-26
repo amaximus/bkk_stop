@@ -3,7 +3,6 @@ from datetime import timedelta
 import logging
 import urllib.request
 import json
-#from random import randint
 
 import voluptuous as vol
 
