@@ -9,7 +9,7 @@ Add the following to resources in your Lovelace config:
 
 ```yaml
 resources:
-  - url: /community_plugin/bkk_stop/bkk_stop-card.js
+  - url: /community/bkk_stop/bkk_stop.js
     type: js
 ```
 
@@ -23,10 +23,10 @@ resources:
 ## Card example
 ---
 ```yaml
-type: custom:bkk_stop-card
+type: custom:bkk_stop
 entity:
   - sensor.bkk7u
-type: custom:bkk_stop-card
+type: custom:bkk_stop
 entity:
   - sensor.bkkXu
 ```
@@ -50,4 +50,3 @@ stopId: 'BKK_F00940'
 minsAfter: 25
 wheelchair: true
 ```
-

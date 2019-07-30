@@ -12,7 +12,7 @@ from homeassistant.helpers.aiohttp_client import async_get_clientsession
 import homeassistant.helpers.config_validation as cv
 from homeassistant.helpers.entity import Entity
 
-REQUIREMENTS = [ "aiohttp==2.0.7" ]
+REQUIREMENTS = [ ]
 
 _LOGGER = logging.getLogger(__name__)
 
