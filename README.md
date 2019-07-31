@@ -1,26 +1,20 @@
-# Custom component for Home Assistant
-## BKK stop custom component
-## Providing also a custom state card for legacyUI and a custom card for Lovelace
+# BKK Stop Information custom component for Home Assistant
+## Providing also a custom state card for legacyUI. 
 
 This custom component and custom card shows Budapest Public Transportation (BKK)
 line information departing in the near future from a configurable stop.<p>
 
-Lovelace UI does not support platform attributes natively.<br />
-Inspired by [entity-attributes-card](https://github.com/custom-cards/entity-attributes-card)
-on handling attributes in Lovelace, a Lovelace custom card was a dept and now made available for BKK Stop.
-
 #### Installation
-Easiest way to install it is through [HACS(Home Assistant Community Store)](https://custom-components.github.io/hacs/),
-search for <i>BKK Stop Information</i> in the Integrations and under Plugins. Both are needed.<br />
+The easiest way to install it is through [HACS (Home Assistant Community Store)](https://custom-components.github.io/hacs/),
+search for <i>BKK Stop Information</i> in the Integrations.<br />
 
-If you are not using HACS, you may download bkk_stop.js for Lovelace and put it into $homeassistant_config_dir/www.<br />
-If you are not using Lovelace please see below instructions for legacy UI.<br />
-Also download the files from custom_components/bkk_stop into your $homeassistant_config_dir/custom_components/bkk_stop.<br />
+If you are not using HACS, download the files from custom_components/bkk_stop into your
+$homeassistant_config_dir/custom_components/bkk_stop.<br />
 
 Once downloaded and configured as per below information you'll need to restart HomeAssistant to have the custom component
 and the sensors of bkk_stop platform taken into consideration.
 
-#### Custom component configuration:
+#### Configuration:
 Define sensors with the following configuration parameters:<br />
 
 **name** (Optional): Name of component<br />
@@ -30,7 +24,7 @@ Define sensors with the following configuration parameters:<br />
 **bikes** (Optional): Display whether bikes are allowed on vehicle (default: false)<br />
 **ignoreNow** (Optional): Ignore vehicles already in the station (default: true) <br />
 
-#### Custom component example configuration
+#### Example
 ```
 platform: bkk_stop
 name: 'bkk7u'
@@ -39,18 +33,8 @@ minsAfter: 25
 wheelchair: true
 ```
 
-#### Lovelace UI configuration
-Add the following lines to your ui-lovelace.yaml (entity should be the sensor of bkk_stop platform you defined):
-```
-resources:
-  - {type: module, url: '/www/community/bkk_stop/bkk_stop.js'}
-
-    cards:
-      - type: custom:bkk_stop
-        entity: sensor.bkk7u
-      - type: custom:bkk_stop
-        entity: sensor.bkkxu
-```
+#### Lovelace UI
+There is a Lovelace custom card related to this component at [https://github.com/amaximus/bkk_stop_card](https://github.com/amaximus/bkk_stop_card).
 
 #### Legacy UI
 Custom state card is provided for presenting data on legacy UI. Pls see the legacyUI directory structure for example.
