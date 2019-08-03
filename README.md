@@ -34,7 +34,7 @@ wheelchair: true
 ```
 
 #### Lovelace UI
-There is a Lovelace custom card related to this component at [https://github.com/amaximus/bkk_stop_card](https://github.com/amaximus/bkk_stop_card).
+There is a Lovelace custom card related to this component at [https://github.com/amaximus/bkk-stop-card](https://github.com/amaximus/bkk-stop-card).
 
 #### Legacy UI
 Custom state card is provided for presenting data on legacy UI. Pls see the legacyUI directory structure for example.
