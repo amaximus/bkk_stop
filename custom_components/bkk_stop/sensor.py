@@ -71,7 +71,7 @@ class BKKPublicTransportSensor(Entity):
     def device_state_attributes(self):
         attr = {}
         bkkfile = "/tmp/" + self._stopid + ".json"
-        bkkdata = json.load(open(bkkfile))
+        bkkdata = json.load(open(bkkfile,encoding='utf-8'))
 
         if bkkdata["status"] != "OK":
            return None
