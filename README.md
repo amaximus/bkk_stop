@@ -17,12 +17,21 @@ and the sensors of bkk_stop platform taken into consideration.
 #### Configuration:
 Define sensors with the following configuration parameters:<br />
 
-**name** (Optional): Name of component<br />
-**stopId** (Required): StopId as per [futar.bkk.hu](http://futar.bkk.hu)<br />
-**minsAfter** (Optional): Number of minutes ahead to show vehicles departing from station (default: 20)<br />
-**wheelchair** (Optional): Display vehicle's wheelchair accessibility (default: false)<br />
-**bikes** (Optional): Display whether bikes are allowed on vehicle (default: false)<br />
-**ignoreNow** (Optional): Ignore vehicles already in the station (default: true) <br />
+---
+| Name | Optional | `Default` | Description
+| :---- | :------- | :--------| :------------ |
+| name | **N** | - | sensor of bkk_stop type to display
+| :---- | :------- | :--------| :------------ |
+| stopId | **N** | - | StopId as per [futar.bkk.hu](http://futar.bkk.hu) 
+| :---- | :------- | :--------| :------------ |
+| minsAfter | **Y** | `20` | Number of minutes ahead to show vehicles departing from station
+| :---- | :------- | :--------| :------------ |
+| wheelchair | **Y** | `false` | Display vehicle's wheelchair accessibility
+| :---- | :------- | :--------| :------------ |
+| bikes | **Y** | `false` | Display whether bikes are allowed on vehicle
+| :---- | :------- | :--------| :------------ |
+| ignoreNow | **Y** | `true` | Ignore vehicles already in the station
+---
 
 #### Example
 ```
@@ -41,6 +50,3 @@ Custom state card is provided for presenting data on legacy UI. Pls see the lega
 
 Lovelace UI:<br />
 ![bkk_stop Lovelace example](example/bkk_lovelace.jpg)
-
-Legacy UI:<br />
-![bkk_stop legacy UI example](example/bkk_hass.jpg)
