@@ -19,6 +19,7 @@ Define sensors with the following configuration parameters:<br />
 
 ---
 | Name | Optional | `Default` | Description |
+| :---- | :---- | :------- | :----------- |
 | name | **N** | - | sensor of bkk_stop type to display |
 | stopId | **N** | - | StopId as per [futar.bkk.hu](http://futar.bkk.hu) |
 | minsAfter | **Y** | `20` | Number of minutes ahead to show vehicles departing from station |
