@@ -1,7 +1,7 @@
+import aiohttp
 import asyncio
 from datetime import timedelta
 import logging
-import urllib.request
 import json
 
 import voluptuous as vol
@@ -48,30 +48,28 @@ def async_setup_platform(hass, config, async_add_devices, discovery_info=None):
     bikes = config.get(CONF_BIKES)
     ignorenow = config.get(CONF_IGNORENOW)
 
-    session = async_get_clientsession(hass)
-
     async_add_devices(
-        [BKKPublicTransportSensor(name, stopid, minsafter, wheelchair, bikes, ignorenow)],update_before_add=True)
+        [BKKPublicTransportSensor(hass, name, stopid, minsafter, wheelchair, bikes, ignorenow)],update_before_add=True)
 
 class BKKPublicTransportSensor(Entity):
-    #attr = {}
 
-    def __init__(self, name, stopid, minsafter, wheelchair, bikes, ignorenow):
+    def __init__(self, hass, name, stopid, minsafter, wheelchair, bikes, ignorenow):
         """Initialize the sensor."""
         self._name = name
+        self._hass = hass
         self._stopid = stopid
         self._minsafter = minsafter
         self._wheelchair = wheelchair
         self._bikes = bikes
         self._ignorenow = ignorenow
         self._state = None
+        self._bkkdata = {}
         self._icon = DEFAULT_ICON
 
     @property
     def device_state_attributes(self):
         attr = {}
-        bkkfile = "/tmp/" + self._stopid + ".json"
-        bkkdata = json.load(open(bkkfile,encoding='utf-8'))
+        bkkdata = self._bkkdata
 
         if bkkdata["status"] != "OK":
            return None
@@ -115,24 +113,21 @@ class BKKPublicTransportSensor(Entity):
         return attr
 
     @asyncio.coroutine
-    def async_update(self):
+    async def async_update(self):
         _LOGGER.debug("bkk_stop update for " + self._stopid)
 ##        headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.3'}
 #        BKKURL="http://futar.bkk.hu/bkk-utvonaltervezo-api/ws/otp/api/where/arrivals-and-departures-for-stop.json?key=apaiary-test&version=3&appVersion=apiary-1.0&onlyDepartures=true&stopId=" + self._stopid + "&minutesAfter=" + self._minsafter
 #       As of 2019-07-02 upgrade:
         BKKURL="https://futar.bkk.hu/api/query/v1/ws/otp/api/where/arrivals-and-departures-for-stop.json?key=apaiary-test&version=3&appVersion=apiary-1.0&onlyDepartures=true&stopId=" + self._stopid + "&minutesAfter=" + self._minsafter
-        bkkfile = "/tmp/" + self._stopid + ".json"
 
-        opener = urllib.request.build_opener()
-        opener.addheaders = [('User-agent', 'Mozilla/5.0')]
-        urllib.request.install_opener(opener)
-        urllib.request.urlretrieve(BKKURL, bkkfile)
-        bkkdata = json.load(open(bkkfile))
+        session = async_get_clientsession(self._hass)
+        async with session.get(BKKURL) as response:
+          self._bkkdata = await response.json()
 
-        if bkkdata["status"] != "OK":
+        if self._bkkdata["status"] != "OK":
            self._state = None
 
-        if len(bkkdata["data"]["entry"]["stopTimes"]) == 0:
+        if len(self._bkkdata["data"]["entry"]["stopTimes"]) == 0:
            self._state = None
         self._state = 1
         return self._state  
