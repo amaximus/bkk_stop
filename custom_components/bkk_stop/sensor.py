@@ -101,7 +101,7 @@ class BKKPublicTransportSensor(Entity):
             attr['routeid' + str(i)] = bkkdata["data"]["references"]["routes"][routeid]["iconDisplayText"]
             attr['headsign' + str(i)] = bkkdata["data"]["entry"]["stopTimes"][i + failedNode]["stopHeadsign"]
             attime = int(bkkdata["data"]["entry"]["stopTimes"][i + failedNode]["departureTime"])
-            attr['attime' + str(i)] = datetime.utcfromtimestamp(attime).strftime('%H:%M')
+            attr['attime' + str(i)] = datetime.fromtimestamp(attime).strftime('%H:%M')
 
             if self._wheelchair:
                if 'wheelchairAccessible' in bkkdata["data"]["references"]["trips"][tripid]:
