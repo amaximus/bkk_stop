@@ -1,6 +1,7 @@
 import aiohttp
 import asyncio
 from datetime import timedelta
+from datetime import datetime
 import logging
 import json
 
@@ -99,6 +100,8 @@ class BKKPublicTransportSensor(Entity):
             attr['type' + str(i)] = bkkdata["data"]["references"]["routes"][routeid]["type"]
             attr['routeid' + str(i)] = bkkdata["data"]["references"]["routes"][routeid]["iconDisplayText"]
             attr['headsign' + str(i)] = bkkdata["data"]["entry"]["stopTimes"][i + failedNode]["stopHeadsign"]
+            attime = int(bkkdata["data"]["entry"]["stopTimes"][i + failedNode]["departureTime"])
+            attr['attime' + str(i)] = datetime.utcfromtimestamp(attime).strftime('%H:%M')
 
             if self._wheelchair:
                if 'wheelchairAccessible' in bkkdata["data"]["references"]["trips"][tripid]:
