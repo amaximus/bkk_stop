@@ -2,7 +2,9 @@
   "domain": "bkk_stop",
   "name": "BKK Stop Information",
   "documentation": "https://github.com/amaximus/bkk_stop",
+  "issue_tracker": "https://github.com/amaximus/bkk_stop/issues",
   "dependencies": [],
   "codeowners": ["@amaximus"],
-  "requirements": []
+  "requirements": [],
+  "version": "1.4.1"
 }
