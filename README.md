@@ -9,7 +9,7 @@ This custom component and custom card shows Budapest Public Transportation (BKK)
 line information departing in the near future from a configurable stop.<p>
 
 #### Installation
-The easiest way to install it is through [HACS (Home Assistant Community Store)](https://custom-components.github.io/hacs/),
+The easiest way to install it is through [HACS (Home Assistant Community Store)](https://github.com/hacs/integration),
 search for <i>BKK Stop Information</i> in the Integrations.<br />
 
 If you are not using HACS, download the files from custom_components/bkk_stop into your
