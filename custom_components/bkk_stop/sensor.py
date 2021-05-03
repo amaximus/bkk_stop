@@ -66,6 +66,7 @@ class BKKPublicTransportSensor(Entity):
         self._state = None
         self._bkkdata = {}
         self._icon = DEFAULT_ICON
+        self._session = async_get_clientsession(self._hass)
 
     @property
     def device_state_attributes(self):
@@ -123,8 +124,7 @@ class BKKPublicTransportSensor(Entity):
 #       As of 2019-07-02 upgrade:
         BKKURL="https://futar.bkk.hu/api/query/v1/ws/otp/api/where/arrivals-and-departures-for-stop.json?key=apaiary-test&version=3&appVersion=apiary-1.0&onlyDepartures=true&stopId=" + self._stopid + "&minutesAfter=" + self._minsafter
 
-        session = async_get_clientsession(self._hass)
-        async with session.get(BKKURL) as response:
+        async with self._session.get(BKKURL) as response:
           self._bkkdata = await response.json()
 
         if self._bkkdata["status"] != "OK":
@@ -133,7 +133,7 @@ class BKKPublicTransportSensor(Entity):
         if len(self._bkkdata["data"]["entry"]["stopTimes"]) == 0:
            self._state = None
         self._state = 1
-        return self._state  
+        return self._state
 
     @property
     def name(self):
