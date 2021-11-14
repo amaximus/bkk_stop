@@ -40,7 +40,6 @@ PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend({
 
 @asyncio.coroutine
 def async_setup_platform(hass, config, async_add_devices, discovery_info=None):
-    #_LOGGER.debug("start async setup platform")
 
     name = config.get(CONF_NAME)
     stopid = config.get(CONF_STOPID)
@@ -71,17 +70,19 @@ class BKKPublicTransportSensor(Entity):
     @property
     def device_state_attributes(self):
         attr = {}
+        bkkjson =""
         bkkdata = self._bkkdata
 
         if bkkdata["status"] != "OK":
-           return None
+          return None
 
-        attr["stationName"] = bkkdata["data"]["references"]["stops"][self._stopid]["name"]
-        attr["items"] = len(bkkdata["data"]["entry"]["stopTimes"])
+        bkkjson = "{\"stationName\":\"" + bkkdata["data"]["references"]["stops"][self._stopid]["name"] + "\""
         failedNode = 0
-        if attr["items"] != 0:
+
+        if len(bkkdata["data"]["entry"]["stopTimes"]) != 0:
           currenttime = int(bkkdata["currentTime"] / 1000)
           i = 0
+          bkkjson += ",\"vehicles\":["
           while i < len(bkkdata["data"]["entry"]["stopTimes"]) - failedNode:
             if 'departureTime' not in bkkdata["data"]["entry"]["stopTimes"][i + failedNode]:
                failedNode += 1
@@ -95,26 +96,30 @@ class BKKPublicTransportSensor(Entity):
                failedNode += 1
                continue
 
-            attr['in' + str(i)] = diff
             tripid = bkkdata["data"]["entry"]["stopTimes"][i + failedNode]["tripId"]
             routeid = bkkdata["data"]["references"]["trips"][tripid]["routeId"]
-            attr['type' + str(i)] = bkkdata["data"]["references"]["routes"][routeid]["type"]
-            attr['routeid' + str(i)] = bkkdata["data"]["references"]["routes"][routeid]["iconDisplayText"]
-            attr['headsign' + str(i)] = bkkdata["data"]["entry"]["stopTimes"][i + failedNode]["stopHeadsign"]
             attime = int(bkkdata["data"]["entry"]["stopTimes"][i + failedNode]["departureTime"])
-            attr['attime' + str(i)] = datetime.fromtimestamp(attime).strftime('%H:%M')
+            bkkjson += "{\"in\":\"" + str(diff) + "\"," + \
+                       "\"type\":\"" + bkkdata["data"]["references"]["routes"][routeid]["type"] + "\"," + \
+                       "\"routeid\":\"" + bkkdata["data"]["references"]["routes"][routeid]["iconDisplayText"] + "\"," + \
+                       "\"headsign\":\"" + bkkdata["data"]["entry"]["stopTimes"][i + failedNode]["stopHeadsign"] + "\"," + \
+                       "\"attime\":\"" + datetime.fromtimestamp(attime).strftime('%H:%M') + "\""
 
             if self._wheelchair:
                if 'wheelchairAccessible' in bkkdata["data"]["references"]["trips"][tripid]:
-                  attr['wheelchair' + str(i)] = str(bkkdata["data"]["references"]["trips"][tripid]["wheelchairAccessible"])
+                  bkkjson += ",\"wheelchair\":\"" + str(bkkdata["data"]["references"]["trips"][tripid]["wheelchairAccessible"]) + "\""
 
             if self._bikes:
                if 'bikesAllowed' in bkkdata["data"]["references"]["trips"][tripid]:
-                  attr['bikesallowed' + str(i)] = bkkdata["data"]["references"]["trips"][tripid]["bikesAllowed"]
-
+                  bkkjson += ",\"bikesallowed\":\""+ bkkdata["data"]["references"]["trips"][tripid]["bikesAllowed"] + "\""
+            bkkjson += "},"
             i += 1
-        attr["items"] = len(bkkdata["data"]["entry"]["stopTimes"]) - failedNode
-        return attr
+
+        # strip last comma as we are closing the list
+        bkkjson = bkkjson[:-1]
+        bkkjson += "]}"
+
+        return json.loads(bkkjson)
 
     @asyncio.coroutine
     async def async_update(self):
