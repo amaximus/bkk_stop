@@ -3,7 +3,6 @@ import asyncio
 from datetime import timedelta
 from datetime import datetime
 import logging
-import json
 
 import voluptuous as vol
 
@@ -69,20 +68,20 @@ class BKKPublicTransportSensor(Entity):
 
     @property
     def device_state_attributes(self):
-        attr = {}
-        bkkjson =""
+        bkkjson = {}
         bkkdata = self._bkkdata
 
         if bkkdata["status"] != "OK":
           return None
 
-        bkkjson = "{\"stationName\":\"" + bkkdata["data"]["references"]["stops"][self._stopid]["name"] + "\""
+        bkkjson["stationName"] = bkkdata["data"]["references"]["stops"][self._stopid]["name"]
+        bkkjson["vehicles"] = []
         failedNode = 0
-
+    
         if len(bkkdata["data"]["entry"]["stopTimes"]) != 0:
           currenttime = int(bkkdata["currentTime"] / 1000)
           i = 0
-          bkkjson += ",\"vehicles\":["
+
           while i < len(bkkdata["data"]["entry"]["stopTimes"]) - failedNode:
             if 'departureTime' not in bkkdata["data"]["entry"]["stopTimes"][i + failedNode]:
                failedNode += 1
@@ -96,30 +95,29 @@ class BKKPublicTransportSensor(Entity):
                failedNode += 1
                continue
 
-            tripid = bkkdata["data"]["entry"]["stopTimes"][i + failedNode]["tripId"]
+            tripid  = bkkdata["data"]["entry"]["stopTimes"][i + failedNode]["tripId"]
             routeid = bkkdata["data"]["references"]["trips"][tripid]["routeId"]
-            attime = int(bkkdata["data"]["entry"]["stopTimes"][i + failedNode]["departureTime"])
-            bkkjson += "{\"in\":\"" + str(diff) + "\"," + \
-                       "\"type\":\"" + bkkdata["data"]["references"]["routes"][routeid]["type"] + "\"," + \
-                       "\"routeid\":\"" + bkkdata["data"]["references"]["routes"][routeid]["iconDisplayText"] + "\"," + \
-                       "\"headsign\":\"" + bkkdata["data"]["entry"]["stopTimes"][i + failedNode]["stopHeadsign"] + "\"," + \
-                       "\"attime\":\"" + datetime.fromtimestamp(attime).strftime('%H:%M') + "\""
+            attime  = int(bkkdata["data"]["entry"]["stopTimes"][i + failedNode]["departureTime"])
+
+            stopdata = {}
+            stopdata["in"]       = str(diff)
+            stopdata["type"]     = bkkdata["data"]["references"]["routes"][routeid]["type"]
+            stopdata["routeid"]  = bkkdata["data"]["references"]["routes"][routeid]["iconDisplayText"]
+            stopdata["headsign"] = bkkdata["data"]["entry"]["stopTimes"][i + failedNode]["stopHeadsign"]
+            stopdata["attime"]   = datetime.fromtimestamp(attime).strftime('%H:%M')
 
             if self._wheelchair:
                if 'wheelchairAccessible' in bkkdata["data"]["references"]["trips"][tripid]:
-                  bkkjson += ",\"wheelchair\":\"" + str(bkkdata["data"]["references"]["trips"][tripid]["wheelchairAccessible"]) + "\""
+                  stopdata["wheelchair"] = str(bkkdata["data"]["references"]["trips"][tripid]["wheelchairAccessible"])
 
             if self._bikes:
                if 'bikesAllowed' in bkkdata["data"]["references"]["trips"][tripid]:
-                  bkkjson += ",\"bikesallowed\":\""+ bkkdata["data"]["references"]["trips"][tripid]["bikesAllowed"] + "\""
-            bkkjson += "},"
+                  stopdata["bikesallowed"] = bkkdata["data"]["references"]["trips"][tripid]["bikesAllowed"]
+
+            bkkjson["vehicles"].append(stopdata)
             i += 1
 
-        # strip last comma as we are closing the list
-        bkkjson = bkkjson[:-1]
-        bkkjson += "]}"
-
-        return json.loads(bkkjson)
+        return bkkjson
 
     @asyncio.coroutine
     async def async_update(self):
