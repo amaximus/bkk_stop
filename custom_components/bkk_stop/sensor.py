@@ -92,6 +92,7 @@ class BKKPublicTransportSensor(Entity):
             tripid  = stopTime.get("tripId")
             routeid = bkkdata["data"]["references"]["trips"][tripid]["routeId"]
             attime  = stopTime.get("departureTime")
+            predicted_attime = stopTime.get("predictedDepartureTime")
 
             stopdata = {}
             stopdata["in"]       = str(diff)
@@ -99,6 +100,8 @@ class BKKPublicTransportSensor(Entity):
             stopdata["routeid"]  = bkkdata["data"]["references"]["routes"][routeid]["iconDisplayText"]
             stopdata["headsign"] = stopTime.get("stopHeadsign","?")
             stopdata["attime"]   = datetime.fromtimestamp(attime).strftime('%H:%M')
+            if predicted_attime:
+                stopdata["predicted_attime"] = datetime.fromtimestamp(predicted_attime).strftime('%H:%M')
 
             if self._wheelchair:
                if 'wheelchairAccessible' in bkkdata["data"]["references"]["trips"][tripid]:
