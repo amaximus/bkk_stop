@@ -80,31 +80,28 @@ class BKKPublicTransportSensor(Entity):
     
         if len(bkkdata["data"]["entry"]["stopTimes"]) != 0:
           currenttime = int(bkkdata["currentTime"] / 1000)
-          i = 0
 
-          while i < len(bkkdata["data"]["entry"]["stopTimes"]) - failedNode:
-            if 'departureTime' not in bkkdata["data"]["entry"]["stopTimes"][i + failedNode]:
-               failedNode += 1
-               continue
-
+          for stopTime in bkkdata["data"]["entry"]["stopTimes"]:
             diff = 0
-            diff = int((bkkdata["data"]["entry"]["stopTimes"][i + failedNode]["departureTime"] - currenttime ) / 60)
+            diff = int( stopTime.get("departureTime", 0) - currenttime ) / 60
             if diff < 0:
                diff = 0
             if self._ignorenow and diff == 0:
-               failedNode += 1
                continue
 
-            tripid  = bkkdata["data"]["entry"]["stopTimes"][i + failedNode]["tripId"]
+            tripid  = stopTime.get("tripId")
             routeid = bkkdata["data"]["references"]["trips"][tripid]["routeId"]
-            attime  = int(bkkdata["data"]["entry"]["stopTimes"][i + failedNode]["departureTime"])
+            attime  = stopTime.get("departureTime")
+            predicted_attime = stopTime.get("predictedDepartureTime")
 
             stopdata = {}
             stopdata["in"]       = str(diff)
             stopdata["type"]     = bkkdata["data"]["references"]["routes"][routeid]["type"]
             stopdata["routeid"]  = bkkdata["data"]["references"]["routes"][routeid]["iconDisplayText"]
-            stopdata["headsign"] = bkkdata["data"]["entry"]["stopTimes"][i + failedNode]["stopHeadsign"]
+            stopdata["headsign"] = stopTime.get("stopHeadsign","?")
             stopdata["attime"]   = datetime.fromtimestamp(attime).strftime('%H:%M')
+            if predicted_attime:
+                stopdata["predicted_attime"] = datetime.fromtimestamp(predicted_attime).strftime('%H:%M')
 
             if self._wheelchair:
                if 'wheelchairAccessible' in bkkdata["data"]["references"]["trips"][tripid]:
@@ -115,7 +112,7 @@ class BKKPublicTransportSensor(Entity):
                   stopdata["bikesallowed"] = bkkdata["data"]["references"]["trips"][tripid]["bikesAllowed"]
 
             bkkjson["vehicles"].append(stopdata)
-            i += 1
+          
 
         return bkkjson
 
