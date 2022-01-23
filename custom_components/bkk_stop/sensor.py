@@ -77,29 +77,29 @@ class BKKPublicTransportSensor(Entity):
         bkkjson["stationName"] = bkkdata["data"]["references"]["stops"][self._stopid]["name"]
         bkkjson["vehicles"] = []
         failedNode = 0
-    
+
         if len(bkkdata["data"]["entry"]["stopTimes"]) != 0:
           currenttime = int(bkkdata["currentTime"] / 1000)
 
           for stopTime in bkkdata["data"]["entry"]["stopTimes"]:
             diff = 0
-            diff = int( stopTime.get("departureTime", 0) - currenttime ) / 60
+            diff = int(( stopTime.get("departureTime", 0) - currenttime ) / 60)
             if diff < 0:
                diff = 0
             if self._ignorenow and diff == 0:
                continue
 
-            tripid  = stopTime.get("tripId")
+            tripid = stopTime.get("tripId")
             routeid = bkkdata["data"]["references"]["trips"][tripid]["routeId"]
-            attime  = stopTime.get("departureTime")
+            attime = stopTime.get("departureTime")
             predicted_attime = stopTime.get("predictedDepartureTime")
 
             stopdata = {}
-            stopdata["in"]       = str(diff)
-            stopdata["type"]     = bkkdata["data"]["references"]["routes"][routeid]["type"]
-            stopdata["routeid"]  = bkkdata["data"]["references"]["routes"][routeid]["iconDisplayText"]
+            stopdata["in"] = str(diff)
+            stopdata["type"] = bkkdata["data"]["references"]["routes"][routeid]["type"]
+            stopdata["routeid"] = bkkdata["data"]["references"]["routes"][routeid]["iconDisplayText"]
             stopdata["headsign"] = stopTime.get("stopHeadsign","?")
-            stopdata["attime"]   = datetime.fromtimestamp(attime).strftime('%H:%M')
+            stopdata["attime"] = datetime.fromtimestamp(attime).strftime('%H:%M')
             if predicted_attime:
                 stopdata["predicted_attime"] = datetime.fromtimestamp(predicted_attime).strftime('%H:%M')
 
@@ -112,7 +112,7 @@ class BKKPublicTransportSensor(Entity):
                   stopdata["bikesallowed"] = bkkdata["data"]["references"]["trips"][tripid]["bikesAllowed"]
 
             bkkjson["vehicles"].append(stopdata)
-          
+
 
         return bkkjson
 
