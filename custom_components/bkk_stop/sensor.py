@@ -67,7 +67,7 @@ class BKKPublicTransportSensor(Entity):
         self._session = async_get_clientsession(self._hass)
 
     @property
-    def device_state_attributes(self):
+    def extra_state_attributes(self):
         bkkjson = {}
         bkkdata = self._bkkdata
 
