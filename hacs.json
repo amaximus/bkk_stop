@@ -1,0 +1,7 @@
+{
+  "name": "BKK Stop Information",
+  "country": ["HU"],
+  "domains": ["bkk_stop"],
+  "render_readme": "true",
+  "iot_class": ["Assumed State"]
+}

@@ -17,11 +17,12 @@ REQUIREMENTS = [ ]
 _LOGGER = logging.getLogger(__name__)
 
 CONF_ATTRIBUTION = "Data provided by futar.bkk.hu"
-CONF_STOPID = 'stopId'
-CONF_MINSAFTER = 'minsAfter'
-CONF_WHEELCHAIR = 'wheelchair'
 CONF_BIKES = 'bikes'
 CONF_IGNORENOW = 'ignoreNow'
+CONF_MINSAFTER = 'minsAfter'
+CONF_MAXITEMS = 'maxItems'
+CONF_STOPID = 'stopId'
+CONF_WHEELCHAIR = 'wheelchair'
 
 DEFAULT_NAME = 'BKK Futar'
 DEFAULT_ICON = 'mdi:bus'
@@ -30,6 +31,7 @@ SCAN_INTERVAL = timedelta(seconds=120)
 
 PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend({
     vol.Required(CONF_STOPID): cv.string,
+    vol.Optional(CONF_MAXITEMS, default=0): cv.string,
     vol.Optional(CONF_MINSAFTER, default=20): cv.string,
     vol.Optional(CONF_WHEELCHAIR, default=False): cv.boolean,
     vol.Optional(CONF_BIKES, default=False): cv.boolean,
@@ -42,21 +44,23 @@ def async_setup_platform(hass, config, async_add_devices, discovery_info=None):
 
     name = config.get(CONF_NAME)
     stopid = config.get(CONF_STOPID)
+    maxitems = config.get(CONF_MAXITEMS)
     minsafter = config.get(CONF_MINSAFTER)
     wheelchair = config.get(CONF_WHEELCHAIR)
     bikes = config.get(CONF_BIKES)
     ignorenow = config.get(CONF_IGNORENOW)
 
     async_add_devices(
-        [BKKPublicTransportSensor(hass, name, stopid, minsafter, wheelchair, bikes, ignorenow)],update_before_add=True)
+        [BKKPublicTransportSensor(hass, name, stopid, minsafter, wheelchair, bikes, ignorenow, maxitems)],update_before_add=True)
 
 class BKKPublicTransportSensor(Entity):
 
-    def __init__(self, hass, name, stopid, minsafter, wheelchair, bikes, ignorenow):
+    def __init__(self, hass, name, stopid, minsafter, wheelchair, bikes, ignorenow, maxitems):
         """Initialize the sensor."""
         self._name = name
         self._hass = hass
         self._stopid = stopid
+        self._maxitems = maxitems
         self._minsafter = minsafter
         self._wheelchair = wheelchair
         self._bikes = bikes
@@ -70,6 +74,7 @@ class BKKPublicTransportSensor(Entity):
     def extra_state_attributes(self):
         bkkjson = {}
         bkkdata = self._bkkdata
+        itemnr = 0
 
         if bkkdata["status"] != "OK":
           return None
@@ -112,7 +117,10 @@ class BKKPublicTransportSensor(Entity):
                   stopdata["bikesallowed"] = bkkdata["data"]["references"]["trips"][tripid]["bikesAllowed"]
 
             bkkjson["vehicles"].append(stopdata)
-
+            if int(self._maxitems) > 0:
+               itemnr += 1
+               if itemnr >= int(self._maxitems):
+                  break
 
         return bkkjson
 
