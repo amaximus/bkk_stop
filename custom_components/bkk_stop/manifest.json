@@ -1,11 +1,11 @@
 {
-  "domain": "bkk_stop",
+  "domain": "bkk_stop_with_widget",
   "name": "BKK Stop Information",
-  "documentation": "https://github.com/amaximus/bkk_stop",
-  "issue_tracker": "https://github.com/amaximus/bkk_stop/issues",
+  "documentation": "https://github.com/joolui/bkk_stop_with_widget",
+  "issue_tracker": "https://github.com/joolui/bkk_stop_with_widget/issues",
   "dependencies": [],
   "codeowners": ["@amaximus"],
   "iot_class": "cloud_polling",
   "requirements": [],
-  "version": "2.1.2"
+  "version": "1.0.0"
 }

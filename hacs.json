@@ -1,7 +1,7 @@
 {
-  "name": "BKK Stop Information",
+  "name": "BKK Stop Information with widget",
   "country": ["HU"],
-  "domains": ["bkk_stop"],
+  "domains": ["bkk_stop_with_widget"],
   "render_readme": "true",
   "iot_class": ["Assumed State"]
 }

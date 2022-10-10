@@ -23,11 +23,12 @@ CONF_MINSAFTER = 'minsAfter'
 CONF_MAXITEMS = 'maxItems'
 CONF_STOPID = 'stopId'
 CONF_WHEELCHAIR = 'wheelchair'
+CONF_FAVORITES = 'favorites'
 
 DEFAULT_NAME = 'BKK Futar'
 DEFAULT_ICON = 'mdi:bus'
 
-SCAN_INTERVAL = timedelta(seconds=120)
+SCAN_INTERVAL = timedelta(seconds=30)
 
 PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend({
     vol.Required(CONF_STOPID): cv.string,
@@ -37,6 +38,7 @@ PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend({
     vol.Optional(CONF_BIKES, default=False): cv.boolean,
     vol.Optional(CONF_IGNORENOW, default='true'): cv.boolean,
     vol.Optional(CONF_NAME, default=DEFAULT_NAME): cv.string,
+    vol.Optional(CONF_FAVORITES, default=0): cv.string,
 })
 
 @asyncio.coroutine
@@ -49,13 +51,14 @@ def async_setup_platform(hass, config, async_add_devices, discovery_info=None):
     wheelchair = config.get(CONF_WHEELCHAIR)
     bikes = config.get(CONF_BIKES)
     ignorenow = config.get(CONF_IGNORENOW)
+    favorites = config.get(CONF_FAVORITES)
 
     async_add_devices(
-        [BKKPublicTransportSensor(hass, name, stopid, minsafter, wheelchair, bikes, ignorenow, maxitems)],update_before_add=True)
+        [BKKPublicTransportSensor(hass, name, stopid, minsafter, wheelchair, bikes, ignorenow, maxitems, favorites)],update_before_add=True)
 
 class BKKPublicTransportSensor(Entity):
 
-    def __init__(self, hass, name, stopid, minsafter, wheelchair, bikes, ignorenow, maxitems):
+    def __init__(self, hass, name, stopid, minsafter, wheelchair, bikes, ignorenow, maxitems, favorites):
         """Initialize the sensor."""
         self._name = name
         self._hass = hass
@@ -65,6 +68,8 @@ class BKKPublicTransportSensor(Entity):
         self._wheelchair = wheelchair
         self._bikes = bikes
         self._ignorenow = ignorenow
+        self._favorites = favorites
+        self._favoritestime = None
         self._state = None
         self._bkkdata = {}
         self._icon = DEFAULT_ICON
@@ -81,6 +86,9 @@ class BKKPublicTransportSensor(Entity):
 
         bkkjson["stationName"] = bkkdata["data"]["references"]["stops"][self._stopid]["name"]
         bkkjson["vehicles"] = []
+        bkkjson["nextfavorite"] = ""
+        bkkjson["nextfavoritetime"] = ""
+        bkkjson["nextfavorite_unit_of_measurement"] = " min"
         failedNode = 0
 
         if len(bkkdata["data"]["entry"]["stopTimes"]) != 0:
@@ -103,6 +111,10 @@ class BKKPublicTransportSensor(Entity):
             stopdata["in"] = str(diff)
             stopdata["type"] = bkkdata["data"]["references"]["routes"][routeid]["type"]
             stopdata["routeid"] = bkkdata["data"]["references"]["routes"][routeid]["iconDisplayText"]
+            if len(bkkjson["nextfavorite"]) == 0 and (stopdata["routeid"] in self._favorites or self._favorites == 0):
+                bkkjson["nextfavorite"] = stopdata["routeid"]
+                bkkjson["nextfavoritetime"] = stopdata["in"]
+                self._favoritestime = stopdata["in"]
             stopdata["headsign"] = stopTime.get("stopHeadsign","?")
             stopdata["attime"] = datetime.fromtimestamp(attime).strftime('%H:%M')
             if predicted_attime:
@@ -149,4 +161,4 @@ class BKKPublicTransportSensor(Entity):
 
     @property
     def state(self):
-        return self._state
+        return self._favoritestime

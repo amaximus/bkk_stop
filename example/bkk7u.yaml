@@ -14,3 +14,6 @@ bikes: false
 ignoreNow: true
 # ignore vehicles already in the station.
 # default: true
+favorites: '49,19'
+# vechicle number to be displayed son the widget
+# default 1

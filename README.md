@@ -31,6 +31,7 @@ Define sensors with the following configuration parameters:<br />
 | wheelchair | **Y** | `false` | Display vehicle's wheelchair accessibility |
 | bikes | **Y** | `false` | Display whether bikes are allowed on vehicle |
 | ignoreNow | **Y** | `true` | Ignore vehicles already in the station |
+| favorites | **Y** | - | Define favorite vechicles (comma separated string) to show them on the widget. If not set, all vechicles are shown |
 ---
 
 #### Example
@@ -40,6 +41,7 @@ name: 'bkk7u'
 stopId: 'BKK_F00940'
 minsAfter: 25
 wheelchair: true
+favorites: '19,49'
 ```
 
 #### Lovelace UI
@@ -50,3 +52,7 @@ Custom state card is provided for presenting data on legacy UI. Pls see the lega
 
 Lovelace UI:<br />
 ![bkk_stop Lovelace example](example/bkk_lovelace.jpg)
+
+Widgets:<br />
+![bkk_stop widget example for one favorite](example/widget.png)
+![bkk_stop widget example for multiple favorites](example/widget_multi.png)
