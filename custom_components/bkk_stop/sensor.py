@@ -16,7 +16,7 @@ REQUIREMENTS = [ ]
 
 _LOGGER = logging.getLogger(__name__)
 
-CONF_ATTRIBUTION = "Data provided by futar.bkk.hu"
+CONF_ATTRIBUTION = "Data provided by go.bkk.hu"
 CONF_BIKES = 'bikes'
 CONF_IGNORENOW = 'ignoreNow'
 CONF_MINSAFTER = 'minsAfter'
@@ -24,7 +24,7 @@ CONF_MAXITEMS = 'maxItems'
 CONF_STOPID = 'stopId'
 CONF_WHEELCHAIR = 'wheelchair'
 
-DEFAULT_NAME = 'BKK Futar'
+DEFAULT_NAME = 'Budapest GO'
 DEFAULT_ICON = 'mdi:bus'
 
 SCAN_INTERVAL = timedelta(seconds=120)
@@ -128,9 +128,9 @@ class BKKPublicTransportSensor(Entity):
     async def async_update(self):
         _LOGGER.debug("bkk_stop update for " + self._stopid)
 ##        headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.3'}
-#        BKKURL="http://futar.bkk.hu/bkk-utvonaltervezo-api/ws/otp/api/where/arrivals-and-departures-for-stop.json?key=apaiary-test&version=3&appVersion=apiary-1.0&onlyDepartures=true&stopId=" + self._stopid + "&minutesAfter=" + self._minsafter
+#        BKKURL="http://go.bkk.hu/bkk-utvonaltervezo-api/ws/otp/api/where/arrivals-and-departures-for-stop.json?key=apaiary-test&version=3&appVersion=apiary-1.0&onlyDepartures=true&stopId=" + self._stopid + "&minutesAfter=" + self._minsafter
 #       As of 2019-07-02 upgrade:
-        BKKURL="https://futar.bkk.hu/api/query/v1/ws/otp/api/where/arrivals-and-departures-for-stop.json?key=apaiary-test&version=3&appVersion=apiary-1.0&onlyDepartures=true&stopId=" + self._stopid + "&minutesAfter=" + self._minsafter
+        BKKURL="https://go.bkk.hu/api/query/v1/ws/otp/api/where/arrivals-and-departures-for-stop.json?key=apaiary-test&version=3&appVersion=apiary-1.0&onlyDepartures=true&stopId=" + self._stopid + "&minutesAfter=" + self._minsafter
 
         async with self._session.get(BKKURL) as response:
           self._bkkdata = await response.json()

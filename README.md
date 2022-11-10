@@ -25,7 +25,7 @@ Define sensors with the following configuration parameters:<br />
 | Name | Optional | `Default` | Description |
 | :---- | :---- | :------- | :----------- |
 | name | **N** | - | sensor of bkk_stop type to display |
-| stopId | **N** | - | StopId as per [futar.bkk.hu](http://futar.bkk.hu) |
+| stopId | **N** | - | StopId as per [go.bkk.hu](https://go.bkk.hu/) |
 | maxItems | **Y** | `0` | Number of items to consider. 0 disables this feature |
 | minsAfter | **Y** | `20` | Number of minutes ahead to show vehicles departing from station |
 | wheelchair | **Y** | `false` | Display vehicle's wheelchair accessibility |
