@@ -166,3 +166,7 @@ class BKKPublicTransportSensor(Entity):
     @property
     def state(self):
         return self._state
+
+    @property
+    def unique_id(self) -> str:
+        return self.entity_id
