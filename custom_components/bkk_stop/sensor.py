@@ -6,11 +6,11 @@ import logging
 
 import voluptuous as vol
 
-from homeassistant.components.sensor import PLATFORM_SCHEMA
-from homeassistant.const import ATTR_ATTRIBUTION, CONF_NAME
+from homeassistant.components.sensor import PLATFORM_SCHEMA, ENTITY_ID_FORMAT
+from homeassistant.const import ATTR_ATTRIBUTION, CONF_NAME, ATTR_ENTITY_ID
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 import homeassistant.helpers.config_validation as cv
-from homeassistant.helpers.entity import Entity
+from homeassistant.helpers.entity import Entity, async_generate_entity_id
 
 REQUIREMENTS = [ ]
 
@@ -39,12 +39,14 @@ PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend({
     vol.Optional(CONF_COLORS, default=False): cv.boolean,
     vol.Optional(CONF_IGNORENOW, default='true'): cv.boolean,
     vol.Optional(CONF_NAME, default=DEFAULT_NAME): cv.string,
+    vol.Optional(ATTR_ENTITY_ID, default=''): cv.string,
 })
 
 @asyncio.coroutine
 def async_setup_platform(hass, config, async_add_devices, discovery_info=None):
 
     name = config.get(CONF_NAME)
+    entityid = config.get(ATTR_ENTITY_ID)
     stopid = config.get(CONF_STOPID)
     maxitems = config.get(CONF_MAXITEMS)
     minsafter = config.get(CONF_MINSAFTER)
@@ -54,11 +56,11 @@ def async_setup_platform(hass, config, async_add_devices, discovery_info=None):
     ignorenow = config.get(CONF_IGNORENOW)
 
     async_add_devices(
-        [BKKPublicTransportSensor(hass, name, stopid, minsafter, wheelchair, bikes, colors, ignorenow, maxitems)],update_before_add=True)
+        [BKKPublicTransportSensor(hass, name, entityid, stopid, minsafter, wheelchair, bikes, colors, ignorenow, maxitems)],update_before_add=True)
 
 class BKKPublicTransportSensor(Entity):
 
-    def __init__(self, hass, name, stopid, minsafter, wheelchair, bikes, colors, ignorenow, maxitems):
+    def __init__(self, hass, name, entityid, stopid, minsafter, wheelchair, bikes, colors, ignorenow, maxitems):
         """Initialize the sensor."""
         self._name = name
         self._hass = hass
@@ -73,6 +75,10 @@ class BKKPublicTransportSensor(Entity):
         self._bkkdata = {}
         self._icon = DEFAULT_ICON
         self._session = async_get_clientsession(self._hass)
+        if entityid == '':
+          self.entity_id = async_generate_entity_id(ENTITY_ID_FORMAT, name, None, hass)
+        else:
+          self.entity_id = async_generate_entity_id(ENTITY_ID_FORMAT, entityid, None, hass)
 
     @property
     def extra_state_attributes(self):
