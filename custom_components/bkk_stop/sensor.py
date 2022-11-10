@@ -18,6 +18,7 @@ _LOGGER = logging.getLogger(__name__)
 
 CONF_ATTRIBUTION = "Data provided by go.bkk.hu"
 CONF_BIKES = 'bikes'
+CONF_COLORS = 'colors'
 CONF_IGNORENOW = 'ignoreNow'
 CONF_MINSAFTER = 'minsAfter'
 CONF_MAXITEMS = 'maxItems'
@@ -35,6 +36,7 @@ PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend({
     vol.Optional(CONF_MINSAFTER, default=20): cv.string,
     vol.Optional(CONF_WHEELCHAIR, default=False): cv.boolean,
     vol.Optional(CONF_BIKES, default=False): cv.boolean,
+    vol.Optional(CONF_COLORS, default=False): cv.boolean,
     vol.Optional(CONF_IGNORENOW, default='true'): cv.boolean,
     vol.Optional(CONF_NAME, default=DEFAULT_NAME): cv.string,
 })
@@ -48,14 +50,15 @@ def async_setup_platform(hass, config, async_add_devices, discovery_info=None):
     minsafter = config.get(CONF_MINSAFTER)
     wheelchair = config.get(CONF_WHEELCHAIR)
     bikes = config.get(CONF_BIKES)
+    colors = config.get(CONF_COLORS)
     ignorenow = config.get(CONF_IGNORENOW)
 
     async_add_devices(
-        [BKKPublicTransportSensor(hass, name, stopid, minsafter, wheelchair, bikes, ignorenow, maxitems)],update_before_add=True)
+        [BKKPublicTransportSensor(hass, name, stopid, minsafter, wheelchair, bikes, colors, ignorenow, maxitems)],update_before_add=True)
 
 class BKKPublicTransportSensor(Entity):
 
-    def __init__(self, hass, name, stopid, minsafter, wheelchair, bikes, ignorenow, maxitems):
+    def __init__(self, hass, name, stopid, minsafter, wheelchair, bikes, colors, ignorenow, maxitems):
         """Initialize the sensor."""
         self._name = name
         self._hass = hass
@@ -64,6 +67,7 @@ class BKKPublicTransportSensor(Entity):
         self._minsafter = minsafter
         self._wheelchair = wheelchair
         self._bikes = bikes
+        self._colors = colors
         self._ignorenow = ignorenow
         self._state = None
         self._bkkdata = {}
@@ -115,6 +119,12 @@ class BKKPublicTransportSensor(Entity):
             if self._bikes:
                if 'bikesAllowed' in bkkdata["data"]["references"]["trips"][tripid]:
                   stopdata["bikesallowed"] = bkkdata["data"]["references"]["trips"][tripid]["bikesAllowed"]
+
+            if self._colors:
+               if 'color' in bkkdata["data"]["references"]["routes"][routeid]:
+                stopdata["color"] = bkkdata["data"]["references"]["routes"][routeid]["color"]
+               if 'textColor' in bkkdata["data"]["references"]["routes"][routeid]:
+                stopdata["textcolor"] = bkkdata["data"]["references"]["routes"][routeid]["textColor"]
 
             bkkjson["vehicles"].append(stopdata)
             if int(self._maxitems) > 0:

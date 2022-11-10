@@ -30,6 +30,7 @@ Define sensors with the following configuration parameters:<br />
 | minsAfter | **Y** | `20` | Number of minutes ahead to show vehicles departing from station |
 | wheelchair | **Y** | `false` | Display vehicle's wheelchair accessibility |
 | bikes | **Y** | `false` | Display whether bikes are allowed on vehicle |
+| colors | **Y** | `false` | Display BKK's default color for the line and the text |
 | ignoreNow | **Y** | `true` | Ignore vehicles already in the station |
 ---
 
