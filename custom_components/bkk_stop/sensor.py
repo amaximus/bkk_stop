@@ -6,25 +6,26 @@ import logging
 
 import voluptuous as vol
 
-from homeassistant.components.sensor import PLATFORM_SCHEMA
-from homeassistant.const import ATTR_ATTRIBUTION, CONF_NAME
+from homeassistant.components.sensor import PLATFORM_SCHEMA, ENTITY_ID_FORMAT
+from homeassistant.const import ATTR_ATTRIBUTION, CONF_NAME, ATTR_ENTITY_ID
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 import homeassistant.helpers.config_validation as cv
-from homeassistant.helpers.entity import Entity
+from homeassistant.helpers.entity import Entity, async_generate_entity_id
 
 REQUIREMENTS = [ ]
 
 _LOGGER = logging.getLogger(__name__)
 
-CONF_ATTRIBUTION = "Data provided by futar.bkk.hu"
+CONF_ATTRIBUTION = "Data provided by go.bkk.hu"
 CONF_BIKES = 'bikes'
+CONF_COLORS = 'colors'
 CONF_IGNORENOW = 'ignoreNow'
 CONF_MINSAFTER = 'minsAfter'
 CONF_MAXITEMS = 'maxItems'
 CONF_STOPID = 'stopId'
 CONF_WHEELCHAIR = 'wheelchair'
 
-DEFAULT_NAME = 'BKK Futar'
+DEFAULT_NAME = 'Budapest GO'
 DEFAULT_ICON = 'mdi:bus'
 
 SCAN_INTERVAL = timedelta(seconds=120)
@@ -35,27 +36,31 @@ PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend({
     vol.Optional(CONF_MINSAFTER, default=20): cv.string,
     vol.Optional(CONF_WHEELCHAIR, default=False): cv.boolean,
     vol.Optional(CONF_BIKES, default=False): cv.boolean,
+    vol.Optional(CONF_COLORS, default=False): cv.boolean,
     vol.Optional(CONF_IGNORENOW, default='true'): cv.boolean,
     vol.Optional(CONF_NAME, default=DEFAULT_NAME): cv.string,
+    vol.Optional(ATTR_ENTITY_ID, default=''): cv.string,
 })
 
 @asyncio.coroutine
 def async_setup_platform(hass, config, async_add_devices, discovery_info=None):
 
     name = config.get(CONF_NAME)
+    entityid = config.get(ATTR_ENTITY_ID)
     stopid = config.get(CONF_STOPID)
     maxitems = config.get(CONF_MAXITEMS)
     minsafter = config.get(CONF_MINSAFTER)
     wheelchair = config.get(CONF_WHEELCHAIR)
     bikes = config.get(CONF_BIKES)
+    colors = config.get(CONF_COLORS)
     ignorenow = config.get(CONF_IGNORENOW)
 
     async_add_devices(
-        [BKKPublicTransportSensor(hass, name, stopid, minsafter, wheelchair, bikes, ignorenow, maxitems)],update_before_add=True)
+        [BKKPublicTransportSensor(hass, name, entityid, stopid, minsafter, wheelchair, bikes, colors, ignorenow, maxitems)],update_before_add=True)
 
 class BKKPublicTransportSensor(Entity):
 
-    def __init__(self, hass, name, stopid, minsafter, wheelchair, bikes, ignorenow, maxitems):
+    def __init__(self, hass, name, entityid, stopid, minsafter, wheelchair, bikes, colors, ignorenow, maxitems):
         """Initialize the sensor."""
         self._name = name
         self._hass = hass
@@ -64,11 +69,16 @@ class BKKPublicTransportSensor(Entity):
         self._minsafter = minsafter
         self._wheelchair = wheelchair
         self._bikes = bikes
+        self._colors = colors
         self._ignorenow = ignorenow
         self._state = None
         self._bkkdata = {}
         self._icon = DEFAULT_ICON
         self._session = async_get_clientsession(self._hass)
+        if entityid == '':
+          self.entity_id = async_generate_entity_id(ENTITY_ID_FORMAT, name, None, hass)
+        else:
+          self.entity_id = async_generate_entity_id(ENTITY_ID_FORMAT, entityid, None, hass)
 
     @property
     def extra_state_attributes(self):
@@ -116,6 +126,12 @@ class BKKPublicTransportSensor(Entity):
                if 'bikesAllowed' in bkkdata["data"]["references"]["trips"][tripid]:
                   stopdata["bikesallowed"] = bkkdata["data"]["references"]["trips"][tripid]["bikesAllowed"]
 
+            if self._colors:
+               if 'color' in bkkdata["data"]["references"]["routes"][routeid]:
+                stopdata["color"] = bkkdata["data"]["references"]["routes"][routeid]["color"]
+               if 'textColor' in bkkdata["data"]["references"]["routes"][routeid]:
+                stopdata["textcolor"] = bkkdata["data"]["references"]["routes"][routeid]["textColor"]
+
             bkkjson["vehicles"].append(stopdata)
             if int(self._maxitems) > 0:
                itemnr += 1
@@ -128,9 +144,9 @@ class BKKPublicTransportSensor(Entity):
     async def async_update(self):
         _LOGGER.debug("bkk_stop update for " + self._stopid)
 ##        headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.3'}
-#        BKKURL="http://futar.bkk.hu/bkk-utvonaltervezo-api/ws/otp/api/where/arrivals-and-departures-for-stop.json?key=apaiary-test&version=3&appVersion=apiary-1.0&onlyDepartures=true&stopId=" + self._stopid + "&minutesAfter=" + self._minsafter
+#        BKKURL="http://go.bkk.hu/bkk-utvonaltervezo-api/ws/otp/api/where/arrivals-and-departures-for-stop.json?key=apaiary-test&version=3&appVersion=apiary-1.0&onlyDepartures=true&stopId=" + self._stopid + "&minutesAfter=" + self._minsafter
 #       As of 2019-07-02 upgrade:
-        BKKURL="https://futar.bkk.hu/api/query/v1/ws/otp/api/where/arrivals-and-departures-for-stop.json?key=apaiary-test&version=3&appVersion=apiary-1.0&onlyDepartures=true&stopId=" + self._stopid + "&minutesAfter=" + self._minsafter
+        BKKURL="https://go.bkk.hu/api/query/v1/ws/otp/api/where/arrivals-and-departures-for-stop.json?key=apaiary-test&version=3&appVersion=apiary-1.0&onlyDepartures=true&stopId=" + self._stopid + "&minutesAfter=" + self._minsafter
 
         async with self._session.get(BKKURL) as response:
           self._bkkdata = await response.json()
@@ -150,3 +166,7 @@ class BKKPublicTransportSensor(Entity):
     @property
     def state(self):
         return self._state
+
+    @property
+    def unique_id(self) -> str:
+        return self.entity_id
