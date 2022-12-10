@@ -24,6 +24,7 @@ CONF_MINSAFTER = 'minsAfter'
 CONF_MAXITEMS = 'maxItems'
 CONF_STOPID = 'stopId'
 CONF_WHEELCHAIR = 'wheelchair'
+CONF_ROUTES = 'routes'
 
 DEFAULT_NAME = 'Budapest GO'
 DEFAULT_ICON = 'mdi:bus'
@@ -39,6 +40,7 @@ PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend({
     vol.Optional(CONF_COLORS, default=False): cv.boolean,
     vol.Optional(CONF_IGNORENOW, default='true'): cv.boolean,
     vol.Optional(CONF_NAME, default=DEFAULT_NAME): cv.string,
+    vol.Optional(CONF_ROUTES, default=''): vol.All(cv.ensure_list, [cv.string]),
     vol.Optional(ATTR_ENTITY_ID, default=''): cv.string,
 })
 
@@ -54,13 +56,14 @@ def async_setup_platform(hass, config, async_add_devices, discovery_info=None):
     bikes = config.get(CONF_BIKES)
     colors = config.get(CONF_COLORS)
     ignorenow = config.get(CONF_IGNORENOW)
+    routes = config.get(CONF_ROUTES)
 
     async_add_devices(
-        [BKKPublicTransportSensor(hass, name, entityid, stopid, minsafter, wheelchair, bikes, colors, ignorenow, maxitems)],update_before_add=True)
+        [BKKPublicTransportSensor(hass, name, entityid, stopid, minsafter, wheelchair, bikes, colors, ignorenow, maxitems, routes)],update_before_add=True)
 
 class BKKPublicTransportSensor(Entity):
 
-    def __init__(self, hass, name, entityid, stopid, minsafter, wheelchair, bikes, colors, ignorenow, maxitems):
+    def __init__(self, hass, name, entityid, stopid, minsafter, wheelchair, bikes, colors, ignorenow, maxitems, routes):
         """Initialize the sensor."""
         self._name = name
         self._hass = hass
@@ -71,6 +74,7 @@ class BKKPublicTransportSensor(Entity):
         self._bikes = bikes
         self._colors = colors
         self._ignorenow = ignorenow
+        self._routes = routes
         self._state = None
         self._bkkdata = {}
         self._icon = DEFAULT_ICON
@@ -113,6 +117,8 @@ class BKKPublicTransportSensor(Entity):
             stopdata["in"] = str(diff)
             stopdata["type"] = bkkdata["data"]["references"]["routes"][routeid]["type"]
             stopdata["routeid"] = bkkdata["data"]["references"]["routes"][routeid]["iconDisplayText"]
+            if stopdata["routeid"] not in self._routes:
+              continue
             stopdata["headsign"] = stopTime.get("stopHeadsign","?")
             stopdata["attime"] = datetime.fromtimestamp(attime).strftime('%H:%M')
             if predicted_attime:

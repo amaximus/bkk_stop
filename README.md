@@ -32,7 +32,8 @@ Define sensors with the following configuration parameters:<br />
 | bikes | **Y** | `false` | Display whether bikes are allowed on vehicle |
 | colors | **Y** | `false` | Display BKK's default color for the line and the text |
 | ignoreNow | **Y** | `true` | Ignore vehicles already in the station |
-| entity_id | **Y** | - | Used instead of name for automatic generation of entity_id |
+| entity_id | **Y** | `` | Used instead of name for automatic generation of entity_id |
+| routes | **Y** | `` | List of routes to consider. Those not listed will be discarded |
 ---
 
 #### Example
@@ -42,6 +43,10 @@ name: 'bkk7u'
 stopId: 'BKK_F00940'
 minsAfter: 25
 wheelchair: true
+routes:
+  - 287
+  - 114
+  - 213
 ```
 
 #### Lovelace UI
