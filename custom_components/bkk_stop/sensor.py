@@ -40,7 +40,7 @@ PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend({
     vol.Optional(CONF_COLORS, default=False): cv.boolean,
     vol.Optional(CONF_IGNORENOW, default='true'): cv.boolean,
     vol.Optional(CONF_NAME, default=DEFAULT_NAME): cv.string,
-    vol.Optional(CONF_ROUTES, default=''): vol.All(cv.ensure_list, [cv.string]),
+    vol.Optional(CONF_ROUTES, default=[]): vol.All(cv.ensure_list, [cv.string]),
     vol.Optional(ATTR_ENTITY_ID, default=''): cv.string,
 })
 
@@ -117,7 +117,7 @@ class BKKPublicTransportSensor(Entity):
             stopdata["in"] = str(diff)
             stopdata["type"] = bkkdata["data"]["references"]["routes"][routeid]["type"]
             stopdata["routeid"] = bkkdata["data"]["references"]["routes"][routeid]["iconDisplayText"]
-            if stopdata["routeid"] not in self._routes:
+            if len(self._routes) != 0 and stopdata["routeid"] not in self._routes:
               continue
             stopdata["headsign"] = stopTime.get("stopHeadsign","?")
             stopdata["attime"] = datetime.fromtimestamp(attime).strftime('%H:%M')
