@@ -33,6 +33,7 @@ Define sensors with the following configuration parameters:<br />
 | colors | **Y** | `false` | Display BKK's default color for the line and the text |
 | ignoreNow | **Y** | `true` | Ignore vehicles already in the station |
 | entity_id | **Y** | `` | Used instead of name for automatic generation of entity_id |
+| inPredicted | **Y** | `false` | Calculate time in as per estimated arrival time, when available |
 | routes | **Y** | `` | List of routes to consider. Those not listed will be discarded |
 ---
 

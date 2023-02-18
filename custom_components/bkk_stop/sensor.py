@@ -25,6 +25,7 @@ CONF_MAXITEMS = 'maxItems'
 CONF_STOPID = 'stopId'
 CONF_WHEELCHAIR = 'wheelchair'
 CONF_ROUTES = 'routes'
+CONF_INPREDICTED = 'inPredicted'
 
 DEFAULT_NAME = 'Budapest GO'
 DEFAULT_ICON = 'mdi:bus'
@@ -42,6 +43,7 @@ PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend({
     vol.Optional(CONF_NAME, default=DEFAULT_NAME): cv.string,
     vol.Optional(CONF_ROUTES, default=[]): vol.All(cv.ensure_list, [cv.string]),
     vol.Optional(ATTR_ENTITY_ID, default=''): cv.string,
+    vol.Optional(CONF_INPREDICTED, default='false'): cv.boolean,
 })
 
 @asyncio.coroutine
@@ -57,13 +59,14 @@ def async_setup_platform(hass, config, async_add_devices, discovery_info=None):
     colors = config.get(CONF_COLORS)
     ignorenow = config.get(CONF_IGNORENOW)
     routes = config.get(CONF_ROUTES)
+    inpredicted = config.get(CONF_INPREDICTED)
 
     async_add_devices(
-        [BKKPublicTransportSensor(hass, name, entityid, stopid, minsafter, wheelchair, bikes, colors, ignorenow, maxitems, routes)],update_before_add=True)
+        [BKKPublicTransportSensor(hass, name, entityid, stopid, minsafter, wheelchair, bikes, colors, ignorenow, maxitems, routes, inpredicted)],update_before_add=True)
 
 class BKKPublicTransportSensor(Entity):
 
-    def __init__(self, hass, name, entityid, stopid, minsafter, wheelchair, bikes, colors, ignorenow, maxitems, routes):
+    def __init__(self, hass, name, entityid, stopid, minsafter, wheelchair, bikes, colors, ignorenow, maxitems, routes, inpredicted):
         """Initialize the sensor."""
         self._name = name
         self._hass = hass
@@ -74,6 +77,7 @@ class BKKPublicTransportSensor(Entity):
         self._bikes = bikes
         self._colors = colors
         self._ignorenow = ignorenow
+        self._inpredicted = inpredicted
         self._routes = routes
         self._state = None
         self._bkkdata = {}
@@ -103,6 +107,9 @@ class BKKPublicTransportSensor(Entity):
           for stopTime in bkkdata["data"]["entry"]["stopTimes"]:
             diff = 0
             diff = int(( stopTime.get("departureTime", 0) - currenttime ) / 60)
+            if self._inpredicted and 'predictedDepartureTime' in stopTime:
+              diff = int(( stopTime.get("predictedDepartureTime", 0) - currenttime ) / 60)
+
             if diff < 0:
                diff = 0
             if self._ignorenow and diff == 0:
@@ -143,6 +150,8 @@ class BKKPublicTransportSensor(Entity):
                itemnr += 1
                if itemnr >= int(self._maxitems):
                   break
+        dt_now = datetime.now()
+        bkkjson["updatedAt"] = dt_now.strftime("%Y/%m/%d %H:%M")
 
         return bkkjson
 
