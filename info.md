@@ -26,6 +26,7 @@ Define sensors with the following configuration parameters:<br />
 | :---- | :---- | :------- | :----------- |
 | name | **N** | - | sensor of bkk_stop type to display |
 | stopId | **N** | - | StopId as per [go.bkk.hu](https://go.bkk.hu/) |
+| apiKey | **N** | - | API Key to BKK data as per [opendata.bkk.hu](https://opendata.bkk.hu/) |
 | maxItems | **Y** | `0` | Number of items to consider. 0 disables this feature |
 | minsAfter | **Y** | `20` | Number of minutes ahead to show vehicles departing from station |
 | wheelchair | **Y** | `false` | Display vehicle's wheelchair accessibility |
@@ -37,6 +38,9 @@ Define sensors with the following configuration parameters:<br />
 | routes | **Y** | `` | List of routes to consider. Those not listed will be discarded |
 ---
 
+On begining of June the test API key has been revoked, therefore to use this integration you'll have to create an account
+at [opendata.bkk.hu](https://opendata.bkk.hu/), generate an API key for yourself and set that in the integration configuration.
+
 #### Example
 ```
 platform: bkk_stop
@@ -44,6 +48,7 @@ name: 'bkk7u'
 stopId: 'BKK_F00940'
 minsAfter: 25
 wheelchair: true
+apiKey: !secret bkk_apikey
 routes:
   - 287
   - 114

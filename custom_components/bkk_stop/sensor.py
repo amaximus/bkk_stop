@@ -25,6 +25,7 @@ CONF_STOPID = 'stopId'
 CONF_WHEELCHAIR = 'wheelchair'
 CONF_ROUTES = 'routes'
 CONF_INPREDICTED = 'inPredicted'
+CONF_APIKEY = 'apiKey'
 
 DEFAULT_NAME = 'Budapest GO'
 DEFAULT_ICON = 'mdi:bus'
@@ -33,6 +34,7 @@ SCAN_INTERVAL = timedelta(seconds=120)
 
 PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend({
     vol.Required(CONF_STOPID): cv.string,
+    vol.Required(CONF_APIKEY): cv.string,
     vol.Optional(CONF_MAXITEMS, default=0): cv.string,
     vol.Optional(CONF_MINSAFTER, default=20): cv.string,
     vol.Optional(CONF_WHEELCHAIR, default=False): cv.boolean,
@@ -58,13 +60,14 @@ async def async_setup_platform(hass, config, async_add_devices, discovery_info=N
     ignorenow = config.get(CONF_IGNORENOW)
     routes = config.get(CONF_ROUTES)
     inpredicted = config.get(CONF_INPREDICTED)
+    apikey = config.get(CONF_APIKEY)
 
     async_add_devices(
-        [BKKPublicTransportSensor(hass, name, entityid, stopid, minsafter, wheelchair, bikes, colors, ignorenow, maxitems, routes, inpredicted)],update_before_add=True)
+        [BKKPublicTransportSensor(hass, name, entityid, stopid, minsafter, wheelchair, bikes, colors, ignorenow, maxitems, routes, inpredicted, apikey)],update_before_add=True)
 
 class BKKPublicTransportSensor(Entity):
 
-    def __init__(self, hass, name, entityid, stopid, minsafter, wheelchair, bikes, colors, ignorenow, maxitems, routes, inpredicted):
+    def __init__(self, hass, name, entityid, stopid, minsafter, wheelchair, bikes, colors, ignorenow, maxitems, routes, inpredicted, apikey):
         """Initialize the sensor."""
         self._name = name
         self._hass = hass
@@ -76,6 +79,7 @@ class BKKPublicTransportSensor(Entity):
         self._colors = colors
         self._ignorenow = ignorenow
         self._inpredicted = inpredicted
+        self._apikey = apikey
         self._routes = routes
         self._state = None
         self._bkkdata = {}
@@ -158,7 +162,7 @@ class BKKPublicTransportSensor(Entity):
 ##        headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.3'}
 #        BKKURL="http://go.bkk.hu/bkk-utvonaltervezo-api/ws/otp/api/where/arrivals-and-departures-for-stop.json?key=apaiary-test&version=3&appVersion=apiary-1.0&onlyDepartures=true&stopId=" + self._stopid + "&minutesAfter=" + self._minsafter
 #       As of 2019-07-02 upgrade:
-        BKKURL="https://go.bkk.hu/api/query/v1/ws/otp/api/where/arrivals-and-departures-for-stop.json?key=apaiary-test&version=3&appVersion=apiary-1.0&onlyDepartures=true&stopId=" + self._stopid + "&minutesAfter=" + self._minsafter
+        BKKURL="https://go.bkk.hu/api/query/v1/ws/otp/api/where/arrivals-and-departures-for-stop.json?key=" + self._apikey + "&version=3&appVersion=apiary-1.0&onlyDepartures=true&stopId=" + self._stopid + "&minutesAfter=" + self._minsafter
 
         async with self._session.get(BKKURL) as response:
           self._bkkdata = await response.json()
