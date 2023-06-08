@@ -1,5 +1,4 @@
 import aiohttp
-import asyncio
 from datetime import timedelta
 from datetime import datetime
 import logging
@@ -46,8 +45,7 @@ PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend({
     vol.Optional(CONF_INPREDICTED, default='false'): cv.boolean,
 })
 
-@asyncio.coroutine
-def async_setup_platform(hass, config, async_add_devices, discovery_info=None):
+async def async_setup_platform(hass, config, async_add_devices, discovery_info=None):
 
     name = config.get(CONF_NAME)
     entityid = config.get(ATTR_ENTITY_ID)
@@ -155,7 +153,6 @@ class BKKPublicTransportSensor(Entity):
 
         return bkkjson
 
-    @asyncio.coroutine
     async def async_update(self):
         _LOGGER.debug("bkk_stop update for " + self._stopid)
 ##        headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.3'}
