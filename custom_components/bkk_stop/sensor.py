@@ -15,17 +15,18 @@ REQUIREMENTS = [ ]
 
 _LOGGER = logging.getLogger(__name__)
 
+CONF_APIKEY = 'apiKey'
 CONF_ATTRIBUTION = "Data provided by go.bkk.hu"
 CONF_BIKES = 'bikes'
 CONF_COLORS = 'colors'
+CONF_HEADSIGNS = 'headsigns'
 CONF_IGNORENOW = 'ignoreNow'
+CONF_INPREDICTED = 'inPredicted'
 CONF_MINSAFTER = 'minsAfter'
 CONF_MAXITEMS = 'maxItems'
+CONF_ROUTES = 'routes'
 CONF_STOPID = 'stopId'
 CONF_WHEELCHAIR = 'wheelchair'
-CONF_ROUTES = 'routes'
-CONF_INPREDICTED = 'inPredicted'
-CONF_APIKEY = 'apiKey'
 
 DEFAULT_NAME = 'Budapest GO'
 DEFAULT_ICON = 'mdi:bus'
@@ -33,18 +34,19 @@ DEFAULT_ICON = 'mdi:bus'
 SCAN_INTERVAL = timedelta(seconds=120)
 
 PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend({
-    vol.Required(CONF_STOPID): cv.string,
+    vol.Optional(ATTR_ENTITY_ID, default=''): cv.string,
     vol.Required(CONF_APIKEY): cv.string,
-    vol.Optional(CONF_MAXITEMS, default=0): cv.string,
-    vol.Optional(CONF_MINSAFTER, default=20): cv.string,
-    vol.Optional(CONF_WHEELCHAIR, default=False): cv.boolean,
+    vol.Required(CONF_STOPID): cv.string,
     vol.Optional(CONF_BIKES, default=False): cv.boolean,
     vol.Optional(CONF_COLORS, default=False): cv.boolean,
+    vol.Optional(CONF_HEADSIGNS, default=[]): vol.All(cv.ensure_list, [cv.string]),
     vol.Optional(CONF_IGNORENOW, default='true'): cv.boolean,
+    vol.Optional(CONF_INPREDICTED, default='false'): cv.boolean,
+    vol.Optional(CONF_MAXITEMS, default=0): cv.string,
+    vol.Optional(CONF_MINSAFTER, default=20): cv.string,
     vol.Optional(CONF_NAME, default=DEFAULT_NAME): cv.string,
     vol.Optional(CONF_ROUTES, default=[]): vol.All(cv.ensure_list, [cv.string]),
-    vol.Optional(ATTR_ENTITY_ID, default=''): cv.string,
-    vol.Optional(CONF_INPREDICTED, default='false'): cv.boolean,
+    vol.Optional(CONF_WHEELCHAIR, default=False): cv.boolean,
 })
 
 async def async_setup_platform(hass, config, async_add_devices, discovery_info=None):
@@ -59,15 +61,16 @@ async def async_setup_platform(hass, config, async_add_devices, discovery_info=N
     colors = config.get(CONF_COLORS)
     ignorenow = config.get(CONF_IGNORENOW)
     routes = config.get(CONF_ROUTES)
+    headsigns = config.get(CONF_HEADSIGNS)
     inpredicted = config.get(CONF_INPREDICTED)
     apikey = config.get(CONF_APIKEY)
 
     async_add_devices(
-        [BKKPublicTransportSensor(hass, name, entityid, stopid, minsafter, wheelchair, bikes, colors, ignorenow, maxitems, routes, inpredicted, apikey)],update_before_add=True)
+        [BKKPublicTransportSensor(hass, name, entityid, stopid, minsafter, wheelchair, bikes, colors, ignorenow, maxitems, routes, inpredicted, apikey, headsigns)],update_before_add=True)
 
 class BKKPublicTransportSensor(Entity):
 
-    def __init__(self, hass, name, entityid, stopid, minsafter, wheelchair, bikes, colors, ignorenow, maxitems, routes, inpredicted, apikey):
+    def __init__(self, hass, name, entityid, stopid, minsafter, wheelchair, bikes, colors, ignorenow, maxitems, routes, inpredicted, apikey, headsigns):
         """Initialize the sensor."""
         self._name = name
         self._hass = hass
@@ -81,6 +84,7 @@ class BKKPublicTransportSensor(Entity):
         self._inpredicted = inpredicted
         self._apikey = apikey
         self._routes = routes
+        self._headsigns = headsigns
         self._state = None
         self._bkkdata = {}
         self._icon = DEFAULT_ICON
@@ -129,6 +133,8 @@ class BKKPublicTransportSensor(Entity):
             if len(self._routes) != 0 and stopdata["routeid"] not in self._routes:
               continue
             stopdata["headsign"] = stopTime.get("stopHeadsign","?")
+            if len(self._headsigns) != 0 and stopdata["headsign"] not in self._headsigns:
+              continue
             stopdata["attime"] = datetime.fromtimestamp(attime).strftime('%H:%M')
             if predicted_attime:
                 stopdata["predicted_attime"] = datetime.fromtimestamp(predicted_attime).strftime('%H:%M')

@@ -36,6 +36,7 @@ Define sensors with the following configuration parameters:<br />
 | entity_id | **Y** | `` | Used instead of name for automatic generation of entity_id |
 | inPredicted | **Y** | `false` | Calculate time in as per estimated arrival time, when available |
 | routes | **Y** | `` | List of routes to consider. Those not listed will be discarded |
+| headsigns | **Y** | `` | List of headsigns to consider. Those not listed will be discarded. Useful for trans stations |
 ---
 
 On begining of June the test API key has been revoked, therefore to use this integration you'll have to create an account
