@@ -26,7 +26,7 @@ CONF_MINSAFTER = 'minsAfter'
 CONF_MAXITEMS = 'maxItems'
 CONF_ROUTES = 'routes'
 CONF_STOPID = 'stopId'
-CONF_MINSWALKING = 'minsWalking'
+CONF_MINSBEFORE = 'minsBefore'
 CONF_WHEELCHAIR = 'wheelchair'
 
 DEFAULT_NAME = 'Budapest GO'
@@ -47,7 +47,7 @@ PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend({
     vol.Optional(CONF_MINSAFTER, default=20): cv.string,
     vol.Optional(CONF_NAME, default=DEFAULT_NAME): cv.string,
     vol.Optional(CONF_ROUTES, default=[]): vol.All(cv.ensure_list, [cv.string]),
-    vol.Optional(CONF_MINSWALKING, default=0): cv.string,
+    vol.Optional(CONF_MINSBEFORE, default=0): cv.string,
     vol.Optional(CONF_WHEELCHAIR, default=False): cv.boolean,
 })
 
@@ -65,15 +65,15 @@ async def async_setup_platform(hass, config, async_add_devices, discovery_info=N
     routes = config.get(CONF_ROUTES)
     headsigns = config.get(CONF_HEADSIGNS)
     inpredicted = config.get(CONF_INPREDICTED)
-    minswalking = config.get(CONF_MINSWALKING)
+    minsbefore = config.get(CONF_MINSBEFORE)
     apikey = config.get(CONF_APIKEY)
 
     async_add_devices(
-        [BKKPublicTransportSensor(hass, name, entityid, stopid, minsafter, wheelchair, bikes, colors, ignorenow, maxitems, routes, inpredicted, apikey, headsigns, minswalking)],update_before_add=True)
+        [BKKPublicTransportSensor(hass, name, entityid, stopid, minsafter, wheelchair, bikes, colors, ignorenow, maxitems, routes, inpredicted, apikey, headsigns, minsbefore)],update_before_add=True)
 
 class BKKPublicTransportSensor(Entity):
 
-    def __init__(self, hass, name, entityid, stopid, minsafter, wheelchair, bikes, colors, ignorenow, maxitems, routes, inpredicted, apikey, headsigns, minswalking):
+    def __init__(self, hass, name, entityid, stopid, minsafter, wheelchair, bikes, colors, ignorenow, maxitems, routes, inpredicted, apikey, headsigns, minsbefore):
         """Initialize the sensor."""
         self._name = name
         self._hass = hass
@@ -88,7 +88,7 @@ class BKKPublicTransportSensor(Entity):
         self._apikey = apikey
         self._routes = routes
         self._headsigns = headsigns
-        self._minswalking = minswalking
+        self._minsbefore = minsbefore
         self._state = None
         self._bkkdata = {}
         self._icon = DEFAULT_ICON
@@ -123,8 +123,6 @@ class BKKPublicTransportSensor(Entity):
             if diff < 0:
                diff = 0
             if self._ignorenow and diff == 0:
-               continue
-            if diff < int(self._minswalking):
                continue
 
             tripid = stopTime.get("tripId")
@@ -174,7 +172,7 @@ class BKKPublicTransportSensor(Entity):
 ##        headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.3'}
 #        BKKURL="http://go.bkk.hu/bkk-utvonaltervezo-api/ws/otp/api/where/arrivals-and-departures-for-stop.json?key=apaiary-test&version=3&appVersion=apiary-1.0&onlyDepartures=true&stopId=" + self._stopid + "&minutesAfter=" + self._minsafter
 #       As of 2019-07-02 upgrade:
-        BKKURL="https://go.bkk.hu/api/query/v1/ws/otp/api/where/arrivals-and-departures-for-stop.json?key=" + self._apikey + "&version=3&appVersion=apiary-1.0&onlyDepartures=true&stopId=" + self._stopid + "&minutesAfter=" + self._minsafter
+        BKKURL="https://go.bkk.hu/api/query/v1/ws/otp/api/where/arrivals-and-departures-for-stop.json?key=" + self._apikey + "&version=3&appVersion=apiary-1.0&onlyDepartures=true&stopId=" + self._stopid + "&minutesAfter=" + self._minsafter + "&minutesBefore=-" + self._minsbefore
 
         async with self._session.get(BKKURL) as response:
           self._bkkdata = await response.json()
