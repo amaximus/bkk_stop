@@ -37,7 +37,7 @@ Define sensors with the following configuration parameters:<br />
 | inPredicted | **Y** | `false` | Calculate time in as per estimated arrival time, when available |
 | routes | **Y** | `` | List of routes to consider. Those not listed will be discarded |
 | headsigns | **Y** | `` | List of headsigns to consider. Those not listed will be discarded. Useful for trans stations |
-| minsBefore | **Y** | `0` | Skip vehicles departing from station in `minsBefore` minutes, e.g. while walking to the station |
+| minsBefore | **Y** | `0` | Skip vehicles departing from station in `minsBefore` minutes, e.g. while walking to the station. Use non-positive value! |
 ---
 
 On begining of June the test API key has been revoked, therefore to use this integration you'll have to create an account
