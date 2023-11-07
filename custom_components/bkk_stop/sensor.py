@@ -2,7 +2,7 @@ import aiohttp
 from datetime import timedelta
 from datetime import datetime
 import logging
-
+import pytz
 import voluptuous as vol
 
 from homeassistant.components.sensor import PLATFORM_SCHEMA, ENTITY_ID_FORMAT
@@ -91,6 +91,7 @@ class BKKPublicTransportSensor(Entity):
         self._minsbefore = minsbefore
         self._state = None
         self._bkkdata = {}
+        self._tz = pytz.timezone(hass.config.time_zone)
         self._icon = DEFAULT_ICON
         self._session = async_get_clientsession(self._hass)
         if entityid == '':
@@ -139,9 +140,9 @@ class BKKPublicTransportSensor(Entity):
             stopdata["headsign"] = stopTime.get("stopHeadsign","?")
             if len(self._headsigns) != 0 and stopdata["headsign"] not in self._headsigns:
               continue
-            stopdata["attime"] = datetime.fromtimestamp(attime).strftime('%H:%M')
+            stopdata["attime"] = datetime.fromtimestamp(attime, self._tz).strftime('%H:%M')
             if predicted_attime:
-                stopdata["predicted_attime"] = datetime.fromtimestamp(predicted_attime).strftime('%H:%M')
+                stopdata["predicted_attime"] = datetime.fromtimestamp(predicted_attime, self._tz).strftime('%H:%M')
 
             if self._wheelchair:
                if 'wheelchairAccessible' in bkkdata["data"]["references"]["trips"][tripid]:
