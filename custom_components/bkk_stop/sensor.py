@@ -32,6 +32,7 @@ CONF_WHEELCHAIR = 'wheelchair'
 DEFAULT_NAME = 'Budapest GO'
 DEFAULT_ICON = 'mdi:bus'
 
+HTTP_TIMEOUT = 15 # secs
 SCAN_INTERVAL = timedelta(seconds=120)
 
 PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend({
@@ -93,7 +94,6 @@ class BKKPublicTransportSensor(Entity):
         self._bkkdata = {}
         self._tz = pytz.timezone(hass.config.time_zone)
         self._icon = DEFAULT_ICON
-        self._session = async_get_clientsession(self._hass)
         if entityid == '':
           self.entity_id = async_generate_entity_id(ENTITY_ID_FORMAT, name, None, hass)
         else:
@@ -169,14 +169,16 @@ class BKKPublicTransportSensor(Entity):
         return bkkjson
 
     async def async_update(self):
+        _session = async_get_clientsession(self._hass)
+
         _LOGGER.debug("bkk_stop update for " + self._stopid)
 ##        headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.3'}
 #        BKKURL="http://go.bkk.hu/bkk-utvonaltervezo-api/ws/otp/api/where/arrivals-and-departures-for-stop.json?key=apaiary-test&version=3&appVersion=apiary-1.0&onlyDepartures=true&stopId=" + self._stopid + "&minutesAfter=" + self._minsafter
 #       As of 2019-07-02 upgrade:
         BKKURL="https://go.bkk.hu/api/query/v1/ws/otp/api/where/arrivals-and-departures-for-stop.json?key=" + self._apikey + "&version=3&appVersion=apiary-1.0&onlyDepartures=true&stopId=" + self._stopid + "&minutesAfter=" + self._minsafter + "&minutesBefore=" + self._minsbefore
 
-        async with self._session.get(BKKURL) as response:
-          self._bkkdata = await response.json()
+        async with _session.get(BKKURL, timeout=HTTP_TIMEOUT) as response:
+          self._bkkdata = await response.json(content_type=None)
 
         if self._bkkdata["status"] != "OK":
            self._state = None
