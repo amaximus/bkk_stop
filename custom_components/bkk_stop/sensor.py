@@ -33,6 +33,7 @@ DEFAULT_NAME = 'Budapest GO'
 DEFAULT_ICON = 'mdi:bus'
 
 HTTP_TIMEOUT = 15 # secs
+MAX_RETRIES = 3
 SCAN_INTERVAL = timedelta(seconds=120)
 
 PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend({
@@ -177,8 +178,18 @@ class BKKPublicTransportSensor(Entity):
 #       As of 2019-07-02 upgrade:
         BKKURL="https://go.bkk.hu/api/query/v1/ws/otp/api/where/arrivals-and-departures-for-stop.json?key=" + self._apikey + "&version=3&appVersion=apiary-1.0&onlyDepartures=true&stopId=" + self._stopid + "&minutesAfter=" + self._minsafter + "&minutesBefore=" + self._minsbefore
 
-        async with _session.get(BKKURL, timeout=HTTP_TIMEOUT) as response:
-          self._bkkdata = await response.json(content_type=None)
+
+        for i in range(MAX_RETRIES):
+          try:
+            async with _session.get(BKKURL, timeout=HTTP_TIMEOUT) as response:
+              self._bkkdata = await response.json(content_type=None)
+
+            if response.status == 200:
+              _LOGGER.debug("Fetch attempt " + str(i+1) + " successful for " + BKKURL)
+              break
+          except (aiohttp.ContentTypeError, aiohttp.ServerDisconnectedError, asyncio.TimeoutError, ClientConnectorError):
+              _LOGGER.debug("Connection error on fetch attempt " + str(i+1) + " for " + BKKURL)
+              time.sleep(10)
 
         if self._bkkdata["status"] != "OK":
            self._state = None
