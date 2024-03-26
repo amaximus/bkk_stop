@@ -170,6 +170,9 @@ class BKKPublicTransportSensor(Entity):
 
         return bkkjson
 
+    def _sleep(secs):
+        time.sleep(secs)
+
     async def async_update(self):
         _session = async_get_clientsession(self._hass)
 
@@ -178,7 +181,6 @@ class BKKPublicTransportSensor(Entity):
 #        BKKURL="http://go.bkk.hu/bkk-utvonaltervezo-api/ws/otp/api/where/arrivals-and-departures-for-stop.json?key=apaiary-test&version=3&appVersion=apiary-1.0&onlyDepartures=true&stopId=" + self._stopid + "&minutesAfter=" + self._minsafter
 #       As of 2019-07-02 upgrade:
         BKKURL="https://go.bkk.hu/api/query/v1/ws/otp/api/where/arrivals-and-departures-for-stop.json?key=" + self._apikey + "&version=3&appVersion=apiary-1.0&onlyDepartures=true&stopId=" + self._stopid + "&minutesAfter=" + self._minsafter + "&minutesBefore=" + self._minsbefore
-
 
         for i in range(MAX_RETRIES):
           try:
@@ -190,7 +192,7 @@ class BKKPublicTransportSensor(Entity):
               break
           except (aiohttp.ContentTypeError, aiohttp.ServerDisconnectedError, asyncio.TimeoutError, ClientConnectorError):
               _LOGGER.debug("Connection error on fetch attempt " + str(i+1) + " for " + BKKURL)
-              time.sleep(10)
+              await hass.async_add_executor_job(_sleep, 10)
 
         if self._bkkdata["status"] != "OK":
            self._state = None

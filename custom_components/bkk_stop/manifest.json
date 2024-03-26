@@ -7,5 +7,5 @@
   "codeowners": ["@amaximus"],
   "iot_class": "cloud_polling",
   "requirements": [],
-  "version": "2.9.6"
+  "version": "2.9.7"
 }
