@@ -187,12 +187,15 @@ class BKKPublicTransportSensor(Entity):
             async with _session.get(BKKURL, timeout=HTTP_TIMEOUT) as response:
               self._bkkdata = await response.json(content_type=None)
 
-            if response.status == 200:
-              _LOGGER.debug("Fetch attempt " + str(i+1) + " successful for " + BKKURL)
+            if not response.status // 100 == 2:
+              _LOGGER.debug("Fetch attempt " + str(i+1) + ": unexpected response " + str(reposnse.status))
+              await self._hass.async_add_executor_job(_sleep, 10)
+            else:
               break
-          except (aiohttp.ContentTypeError, aiohttp.ServerDisconnectedError, asyncio.TimeoutError, ClientConnectorError):
-              _LOGGER.debug("Connection error on fetch attempt " + str(i+1) + " for " + BKKURL)
-              await hass.async_add_executor_job(_sleep, 10)
+          except (aiohttp.ContentTypeError, aiohttp.ServerDisconnectedError, asyncio.TimeoutError, ClientConnectorError) as err:
+              _LOGGER.debug("Fetch attempt " + str(i+1) + " failed for " + BKKURL)
+              _LOGGER.error(err)
+              await self._hass.async_add_executor_job(_sleep, 10)
 
         if self._bkkdata["status"] != "OK":
            self._state = None
