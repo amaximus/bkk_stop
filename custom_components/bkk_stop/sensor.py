@@ -4,6 +4,7 @@ from datetime import timedelta
 from datetime import datetime
 import logging
 import pytz
+import time
 import voluptuous as vol
 
 from homeassistant.components.sensor import PLATFORM_SCHEMA, ENTITY_ID_FORMAT
@@ -74,6 +75,9 @@ async def async_setup_platform(hass, config, async_add_devices, discovery_info=N
     async_add_devices(
         [BKKPublicTransportSensor(hass, name, entityid, stopid, minsafter, wheelchair, bikes, colors, ignorenow, maxitems, routes, inpredicted, apikey, headsigns, minsbefore)],update_before_add=True)
 
+def _sleep(secs):
+    time.sleep(secs)
+
 class BKKPublicTransportSensor(Entity):
 
     def __init__(self, hass, name, entityid, stopid, minsafter, wheelchair, bikes, colors, ignorenow, maxitems, routes, inpredicted, apikey, headsigns, minsbefore):
@@ -107,8 +111,11 @@ class BKKPublicTransportSensor(Entity):
         bkkdata = self._bkkdata
         itemnr = 0
 
-        if bkkdata["status"] != "OK":
-          return None
+        if 'status' in bkkdata:
+           if bkkdata["status"] != "OK":
+              return None
+        else:
+              return None
 
         bkkjson["stationName"] = bkkdata["data"]["references"]["stops"][self._stopid]["name"]
         bkkjson["vehicles"] = []
@@ -170,16 +177,10 @@ class BKKPublicTransportSensor(Entity):
 
         return bkkjson
 
-    def _sleep(secs):
-        time.sleep(secs)
-
     async def async_update(self):
         _session = async_get_clientsession(self._hass)
 
         _LOGGER.debug("bkk_stop update for " + self._stopid)
-##        headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.3'}
-#        BKKURL="http://go.bkk.hu/bkk-utvonaltervezo-api/ws/otp/api/where/arrivals-and-departures-for-stop.json?key=apaiary-test&version=3&appVersion=apiary-1.0&onlyDepartures=true&stopId=" + self._stopid + "&minutesAfter=" + self._minsafter
-#       As of 2019-07-02 upgrade:
         BKKURL="https://go.bkk.hu/api/query/v1/ws/otp/api/where/arrivals-and-departures-for-stop.json?key=" + self._apikey + "&version=3&appVersion=apiary-1.0&onlyDepartures=true&stopId=" + self._stopid + "&minutesAfter=" + self._minsafter + "&minutesBefore=" + self._minsbefore
 
         for i in range(MAX_RETRIES):
@@ -188,21 +189,29 @@ class BKKPublicTransportSensor(Entity):
               self._bkkdata = await response.json(content_type=None)
 
             if not response.status // 100 == 2:
-              _LOGGER.debug("Fetch attempt " + str(i+1) + ": unexpected response " + str(reposnse.status))
+              _LOGGER.debug("Fetch attempt " + str(i+1) + ": unexpected response " + str(response.status))
               await self._hass.async_add_executor_job(_sleep, 10)
             else:
               break
-          except (aiohttp.ContentTypeError, aiohttp.ServerDisconnectedError, asyncio.TimeoutError, ClientConnectorError) as err:
+          except Exception as err:
               _LOGGER.debug("Fetch attempt " + str(i+1) + " failed for " + BKKURL)
-              _LOGGER.error(err)
+              _LOGGER.error(f'error: {err} of type: {type(err)}')
               await self._hass.async_add_executor_job(_sleep, 10)
 
-        if self._bkkdata["status"] != "OK":
+        self._state = 1
+
+        if 'status' in self._bkkdata:
+           if self._bkkdata["status"] != "OK":
+              self._state = None
+        else:
            self._state = None
 
-        if len(self._bkkdata["data"]["entry"]["stopTimes"]) == 0:
+        if 'data' in self._bkkdata:
+           if len(self._bkkdata["data"]["entry"]["stopTimes"]) == 0:
+              self._state = None
+        else:
            self._state = None
-        self._state = 1
+
         return self._state
 
     @property
