@@ -34,7 +34,7 @@ CONF_WHEELCHAIR = 'wheelchair'
 DEFAULT_NAME = 'Budapest GO'
 DEFAULT_ICON = 'mdi:bus'
 
-HTTP_TIMEOUT = 15 # secs
+HTTP_TIMEOUT = 60 # secs
 MAX_RETRIES = 3
 SCAN_INTERVAL = timedelta(seconds=120)
 
