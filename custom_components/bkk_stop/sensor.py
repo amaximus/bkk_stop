@@ -3,7 +3,7 @@ import asyncio
 from datetime import timedelta
 from datetime import datetime
 import logging
-import pytz
+import zoneinfo
 import time
 import voluptuous as vol
 
@@ -78,6 +78,7 @@ async def async_setup_platform(hass, config, async_add_devices, discovery_info=N
 def _sleep(secs):
     time.sleep(secs)
 
+
 class BKKPublicTransportSensor(Entity):
 
     def __init__(self, hass, name, entityid, stopid, minsafter, wheelchair, bikes, colors, ignorenow, maxitems, routes, inpredicted, apikey, headsigns, minsbefore):
@@ -98,7 +99,7 @@ class BKKPublicTransportSensor(Entity):
         self._minsbefore = minsbefore
         self._state = None
         self._bkkdata = {}
-        self._tz = pytz.timezone(hass.config.time_zone)
+        self._tz = zoneinfo.ZoneInfo(hass.config.time_zone)
         self._icon = DEFAULT_ICON
         if entityid == '':
           self.entity_id = async_generate_entity_id(ENTITY_ID_FORMAT, name, None, hass)
