@@ -40,6 +40,8 @@ Define sensors with the following configuration parameters:<br />
 | minsBefore | **Y** | `0` | Skip vehicles departing from station in `minsBefore` minutes, e.g. while walking to the station. Use non-positive value! |
 ---
 
+The integration provides an action ```bkk_stop:refresh``` for instant refresh requiring an entity_id.
+
 On begining of June the test API key has been revoked, therefore to use this integration you'll have to create an account
 at [opendata.bkk.hu](https://opendata.bkk.hu/), generate an API key for yourself and set that in the integration configuration.
 

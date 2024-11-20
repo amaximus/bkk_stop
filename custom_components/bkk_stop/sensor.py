@@ -7,8 +7,9 @@ import zoneinfo
 import time
 import voluptuous as vol
 
+from homeassistant.core import ServiceCall
 from homeassistant.components.sensor import PLATFORM_SCHEMA, ENTITY_ID_FORMAT
-from homeassistant.const import ATTR_ATTRIBUTION, CONF_NAME, ATTR_ENTITY_ID
+from homeassistant.const import ATTR_ATTRIBUTION, CONF_NAME, ATTR_ENTITY_ID, CONF_ENTITY_ID
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 import homeassistant.helpers.config_validation as cv
 from homeassistant.helpers.entity import Entity, async_generate_entity_id
@@ -33,6 +34,14 @@ CONF_WHEELCHAIR = 'wheelchair'
 
 DEFAULT_NAME = 'Budapest GO'
 DEFAULT_ICON = 'mdi:bus'
+DOMAIN = "bkk_stop"
+SENSOR_PLATFORM = "sensor"
+
+REFRESH_SCHEMA = vol.Schema(
+    {
+        vol.Required(CONF_ENTITY_ID): vol.All(cv.ensure_list, [cv.string]),
+    }
+)
 
 HTTP_TIMEOUT = 60 # secs
 MAX_RETRIES = 3
@@ -59,6 +68,7 @@ async def async_setup_platform(hass, config, async_add_devices, discovery_info=N
 
     name = config.get(CONF_NAME)
     entityid = config.get(ATTR_ENTITY_ID)
+
     stopid = config.get(CONF_STOPID)
     maxitems = config.get(CONF_MAXITEMS)
     minsafter = config.get(CONF_MINSAFTER)
@@ -78,10 +88,15 @@ async def async_setup_platform(hass, config, async_add_devices, discovery_info=N
 def _sleep(secs):
     time.sleep(secs)
 
-
 class BKKPublicTransportSensor(Entity):
 
     def __init__(self, hass, name, entityid, stopid, minsafter, wheelchair, bikes, colors, ignorenow, maxitems, routes, inpredicted, apikey, headsigns, minsbefore):
+
+        async def handle_refresh(call: ServiceCall) -> None:
+            """Handle the refresh service call."""
+            _LOGGER.debug("called refesh for %s", self._stopid)
+            self.async_schedule_update_ha_state(force_refresh=True)
+
         """Initialize the sensor."""
         self._name = name
         self._hass = hass
@@ -105,6 +120,15 @@ class BKKPublicTransportSensor(Entity):
           self.entity_id = async_generate_entity_id(ENTITY_ID_FORMAT, name, None, hass)
         else:
           self.entity_id = async_generate_entity_id(ENTITY_ID_FORMAT, entityid, None, hass)
+
+        hass.data.setdefault(DOMAIN, {})
+        hass.data[DOMAIN].setdefault(SENSOR_PLATFORM, {})
+        hass.services.async_register(
+            DOMAIN,
+            "refresh",
+            handle_refresh,
+            schema=REFRESH_SCHEMA,
+    )
 
     @property
     def extra_state_attributes(self):
@@ -175,6 +199,7 @@ class BKKPublicTransportSensor(Entity):
                   break
         dt_now = datetime.now()
         bkkjson["updatedAt"] = dt_now.strftime("%Y/%m/%d %H:%M")
+        self._state = bkkjson["vehicles"][0]["in"]
 
         return bkkjson
 
@@ -199,8 +224,6 @@ class BKKPublicTransportSensor(Entity):
               _LOGGER.error(f'error: {err} of type: {type(err)}')
               await self._hass.async_add_executor_job(_sleep, 10)
 
-        self._state = 1
-
         if 'status' in self._bkkdata:
            if self._bkkdata["status"] != "OK":
               self._state = None
@@ -213,11 +236,18 @@ class BKKPublicTransportSensor(Entity):
         else:
            self._state = None
 
+        _LOGGER.debug("bkk_stop updated for " + self._stopid + ": " + str(self._state))
+
         return self._state
 
     @property
     def name(self):
         return self._name
+
+    @property
+    def native_value(self) -> object:
+        """Return the state of the sensor."""
+        return self._state
 
     @property
     def state(self):
@@ -226,3 +256,12 @@ class BKKPublicTransportSensor(Entity):
     @property
     def unique_id(self) -> str:
         return self.entity_id
+
+    def __repr__(self) -> str:
+        """Return main sensor parameters."""
+        return (
+            f"{self.__class__.__name__}(name={self._name}, "
+            f"entity_id={self.entity_id}, "
+            f"state={self.state}, "
+            f"attributes={self.extra_state_attributes})"
+        )

@@ -1,0 +1,9 @@
+refresh:
+  description: Refresh Budapest GO stop data
+  target:
+    entity:
+      integration: bkk_stop
+  fields:
+    entity_id:
+      description: The BKK stop sensor entity_id
+      example: sensor.bkk_99b
