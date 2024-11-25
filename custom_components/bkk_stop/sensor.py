@@ -199,7 +199,8 @@ class BKKPublicTransportSensor(Entity):
                   break
         dt_now = datetime.now()
         bkkjson["updatedAt"] = dt_now.strftime("%Y/%m/%d %H:%M")
-        self._state = bkkjson["vehicles"][0]["in"]
+        if 'vehicles' in bkkjson and len(bkkjson["vehicles"]) > 0:
+           self._state = bkkjson["vehicles"][0]["in"]
 
         return bkkjson
 
