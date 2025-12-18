@@ -6,7 +6,7 @@ minsAfter: 25
 # the next <minsAfter> minutes.
 # default: 20
 wheelchair: true
-# display vechicel's wheelchair accessibility.
+# display vehicle's wheelchair accessibility.
 # default: false
 bikes: false 
 # display whether bikes are allowed on
