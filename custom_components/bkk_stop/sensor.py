@@ -206,10 +206,10 @@ class BKKPublicTransportSensor(Entity):
         bkkjson["vehicles"] = sorted(vehicles, key=lambda x:x["in"])
         dt_now = datetime.now()
         bkkjson["updatedAt"] = dt_now.strftime("%Y/%m/%d %H:%M")
-        if 'vehicles' in bkkjson and len(bkkjson["vehicles"]) > 0:
+        if len(bkkjson["vehicles"]) > 0:
            self._state = bkkjson["vehicles"][0]["in"]
-
-        bkkjson["vehicles"]
+        else:
+           self._state = None
 
         return bkkjson
 
@@ -218,14 +218,14 @@ class BKKPublicTransportSensor(Entity):
 
         _LOGGER.debug("bkk_stop update for " + ",".join(self._stopid))
         params = {
-            "key": self._apikey,
-            "version": "3",
-            "appVersion": "apiary-1.1",
-            "onlyDepartures": "true",
-            "stopId": self._stopid if isinstance(self._stopid, list) else [self._stopid],
-            "minutesAfter": self._minsafter,
-            "minutesBefore": self._minsbefore,
-            "minResult": self._minresult,
+           "key": self._apikey,
+           "version": "3",
+           "appVersion": "apiary-1.1",
+           "onlyDepartures": "true",
+           "stopId": self._stopid if isinstance(self._stopid, list) else [self._stopid],
+           "minutesAfter": self._minsafter,
+           "minutesBefore": self._minsbefore,
+           "minResult": self._minresult,
         }
         clean_params = {k: v for k, v in params.items() if v is not None}
         base_url = "https://go.bkk.hu/api/query/v1/ws/otp/api/where/arrivals-and-departures-for-stop.json"
