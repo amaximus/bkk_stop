@@ -94,8 +94,13 @@ class BKKPublicTransportSensor(Entity):
 
         async def handle_refresh(call: ServiceCall) -> None:
             """Handle the refresh service call."""
-            _LOGGER.debug("called refesh for %s", self._stopid)
-            self.async_schedule_update_ha_state(force_refresh=True)
+            for target_id in call.data[CONF_ENTITY_ID]:
+                entity = hass.data[DOMAIN][SENSOR_PLATFORM].get(target_id)
+                if entity is None:
+                    _LOGGER.warning("called refresh for unknown entity %s", target_id)
+                    continue
+                _LOGGER.debug("called refresh for %s", target_id)
+                entity.async_schedule_update_ha_state(force_refresh=True)
 
         """Initialize the sensor."""
         self._name = name
@@ -123,6 +128,7 @@ class BKKPublicTransportSensor(Entity):
 
         hass.data.setdefault(DOMAIN, {})
         hass.data[DOMAIN].setdefault(SENSOR_PLATFORM, {})
+        hass.data[DOMAIN][SENSOR_PLATFORM][self.entity_id] = self 
         hass.services.async_register(
             DOMAIN,
             "refresh",
