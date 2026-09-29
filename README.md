@@ -25,10 +25,11 @@ Define sensors with the following configuration parameters:<br />
 | Name | Optional | `Default` | Description |
 | :---- | :---- | :------- | :----------- |
 | name | **N** | - | sensor of bkk_stop type to display |
-| stopId | **N** | - | StopId as per [go.bkk.hu](https://go.bkk.hu/) |
+| stopId | **N** | - | StopId as per [go.bkk.hu](https://go.bkk.hu/). Can be an arrary as well. |
 | apiKey | **N** | - | API Key to BKK data as per [opendata.bkk.hu](https://opendata.bkk.hu/) |
 | maxItems | **Y** | `0` | Number of items to consider. 0 disables this feature |
 | minsAfter | **Y** | `20` | Number of minutes ahead to show vehicles departing from station |
+| minResult | **Y** | `0` | Minuimum number of vehicles ahead to show vehicles departing from station |
 | wheelchair | **Y** | `false` | Display vehicle's wheelchair accessibility |
 | bikes | **Y** | `false` | Display whether bikes are allowed on vehicle |
 | colors | **Y** | `false` | Display BKK's default color for the line and the text |
