@@ -157,9 +157,9 @@ class BKKPublicTransportSensor(Entity):
 
           for stopTime in bkkdata["data"]["entry"]["stopTimes"]:
             diff = 0
-            diff = int(( stopTime.get("departureTime", 0) - currenttime ) / 60)
+            diff = round(( stopTime.get("departureTime", 0) - currenttime ) / 60)
             if self._inpredicted and 'predictedDepartureTime' in stopTime:
-              diff = int(( stopTime.get("predictedDepartureTime", 0) - currenttime ) / 60)
+              diff = round(( stopTime.get("predictedDepartureTime", 0) - currenttime ) / 60)
 
             if diff < 0:
                diff = 0
