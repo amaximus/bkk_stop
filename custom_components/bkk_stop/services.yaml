@@ -7,3 +7,30 @@ refresh:
     entity_id:
       description: The BKK stop sensor entity_id
       example: sensor.bkk_99b
+
+elvira_between:
+  description: Get MÁV ELVIRA departures between two stations.
+  fields:
+    origin_code:
+      description: Origin station code; non-digits are ignored.
+      required: true
+      example: "008001000"
+    dest_code:
+      description: Destination station code; non-digits are ignored.
+      required: true
+      example: "008001200"
+    minutes_after:
+      description: Include departures up to this many minutes from now (15–480).
+      default: 180
+      example: 180
+    dest_name:
+      description: Optional destination label for the returned departure rows.
+      example: Budapest-Keleti
+  response:
+    optional: false
+    type: object
+    fields:
+      departures:
+        description: Matching departure rows, including reservation and platform details.
+        required: true
+        example: []

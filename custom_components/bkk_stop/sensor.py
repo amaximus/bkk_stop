@@ -7,12 +7,13 @@ import zoneinfo
 import time
 import voluptuous as vol
 
-from homeassistant.core import ServiceCall
+from homeassistant.core import ServiceCall, SupportsResponse
 from homeassistant.components.sensor import PLATFORM_SCHEMA, ENTITY_ID_FORMAT
 from homeassistant.const import ATTR_ATTRIBUTION, CONF_NAME, ATTR_ENTITY_ID, CONF_ENTITY_ID
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 import homeassistant.helpers.config_validation as cv
 from homeassistant.helpers.entity import Entity, async_generate_entity_id
+from .elvira import elvira_between
 
 REQUIREMENTS = [ ]
 
@@ -43,6 +44,17 @@ REFRESH_SCHEMA = vol.Schema(
     }
 )
 
+ELVIRA_BETWEEN_SCHEMA = vol.Schema(
+    {
+        vol.Required("origin_code"): cv.string,
+        vol.Required("dest_code"): cv.string,
+        vol.Optional("minutes_after", default=180): vol.All(
+            vol.Coerce(int), vol.Range(min=15, max=480)
+        ),
+        vol.Optional("dest_name", default=""): cv.string,
+    }
+)
+
 HTTP_TIMEOUT = 60 # secs
 MAX_RETRIES = 3
 SCAN_INTERVAL = timedelta(seconds=120)
@@ -65,6 +77,29 @@ PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend({
 })
 
 async def async_setup_platform(hass, config, async_add_devices, discovery_info=None):
+
+    hass.data.setdefault(DOMAIN, {})
+    if not hass.data[DOMAIN].get("elvira_between_registered"):
+        async def handle_elvira_between(call: ServiceCall) -> dict:
+            """Return MÁV departures between two stations."""
+            departures = await elvira_between(
+                async_get_clientsession(hass),
+                hass,
+                call.data["origin_code"],
+                call.data["dest_code"],
+                call.data["minutes_after"],
+                call.data["dest_name"],
+            )
+            return {"departures": departures}
+
+        hass.services.async_register(
+            DOMAIN,
+            "elvira_between",
+            handle_elvira_between,
+            schema=ELVIRA_BETWEEN_SCHEMA,
+            supports_response=SupportsResponse.ONLY,
+        )
+        hass.data[DOMAIN]["elvira_between_registered"] = True
 
     name = config.get(CONF_NAME)
     entityid = config.get(ATTR_ENTITY_ID)

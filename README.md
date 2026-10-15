@@ -42,6 +42,15 @@ Define sensors with the following configuration parameters:<br />
 
 The integration provides an action ```bkk_stop:refresh``` for instant refresh requiring an entity_id.
 
+The integration also provides the response action ```bkk_stop:elvira_between``` for MÁV
+departures. It accepts `origin_code`, `dest_code`, optional `minutes_after` (default
+`180`, range `15`–`480`) and optional `dest_name`. It returns a `departures` array
+with the ELVIRA train number, departure and scheduled times, platform, travel time
+when available, and booking-required flag. The service fetches station data from MÁV
+and caches it for 45 seconds. After this change is merged upstream, HACS can install
+and update the service as part of the normal integration update; no manual file
+copying or configuration patching is needed.
+
 On begining of June the test API key has been revoked, therefore to use this integration you'll have to create an account
 at [opendata.bkk.hu](https://opendata.bkk.hu/), generate an API key for yourself and set that in the integration configuration.
 
